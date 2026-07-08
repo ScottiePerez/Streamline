@@ -16,7 +16,6 @@ const PLATFORMS: { id: Platform; label: string }[] = [
   { id: 'youtube', label: 'YouTube' },
   { id: 'kick', label: 'Kick' },
   { id: 'tiktok', label: 'TikTok' },
-  { id: 'facebook', label: 'Facebook' }
 ]
 
 function SectionHeading({ children }: { children: React.ReactNode }): React.JSX.Element {
@@ -66,7 +65,6 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
   const [teamStatus, setTeamStatus] = useState<TeamClientStatus>('disconnected')
   const [copied, setCopied] = useState(false)
   const [soundPaths, setSoundPaths] = useState<Record<Platform, string | null>>({
-    twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
   })
   const [soundErrors, setSoundErrors] = useState<Partial<Record<Platform, string>>>({})
 

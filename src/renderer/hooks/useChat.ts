@@ -24,11 +24,9 @@ function matchesFilters(msg: ChatMessage, filters: ChatFilters): boolean {
 const MAX_FEED_MESSAGES = 500
 
 const DEFAULT_SOUNDS: Record<Platform, boolean> = {
-  twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
 }
 
 const DEFAULT_PATHS: Record<Platform, string | null> = {
-  twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
 }
 
 export function useChat(

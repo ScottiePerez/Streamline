@@ -11,7 +11,6 @@ const TONES: Record<Platform, ToneConfig> = {
   youtube:  { frequencies: [520, 660], duration: 0.08 },
   kick:     { frequencies: [550],      duration: 0.10 },
   tiktok:   { frequencies: [880, 880], duration: 0.06, gap: 0.08 },
-  facebook: { frequencies: [330],      duration: 0.20 },
 }
 
 export function playDefaultTone(platform: Platform): void {

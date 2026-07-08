@@ -6,7 +6,6 @@ const PLATFORM_STYLES: Record<Platform, { bg: string; label: string }> = {
   youtube:  { bg: 'bg-red-500/20 text-red-300',       label: 'YT' },
   kick:     { bg: 'bg-green-500/20 text-green-300',   label: 'KI' },
   tiktok:   { bg: 'bg-gray-500/20 text-gray-300',     label: 'TK' },
-  facebook: { bg: 'bg-blue-500/20 text-blue-300',     label: 'FB' }
 }
 
 interface Props {

@@ -6,7 +6,6 @@ import { TwitchAdapter } from './adapters/twitch'
 import { YouTubeAdapter } from './adapters/youtube'
 import { KickAdapter } from './adapters/kick'
 import { TikTokAdapter } from './adapters/tiktok'
-import { FacebookAdapter } from './adapters/facebook'
 import { registerIpcHandlers } from './ipc-handlers'
 import { getToken, getSecret } from './auth/keychain'
 import { handleOAuthCallback } from './auth/twitch-oauth'
@@ -26,7 +25,6 @@ async function tryConnect(
     youtube: () => new YouTubeAdapter(),
     kick: () => new KickAdapter(),
     tiktok: () => new TikTokAdapter(),
-    facebook: () => new FacebookAdapter()
   }
   const adapter = adapters[platform]()
   bus.registerAdapter(adapter)
@@ -110,31 +108,3 @@ async function main(): Promise<void> {
     }).catch(err => console.error('Auto-connect failed (tiktok):', err))
   }
 
-  const facebookToken = await getToken('facebook')
-  if (facebookToken && settings.facebookLiveVideoId) {
-    tryConnect(bus, 'facebook', {
-      platform: 'facebook',
-      token: facebookToken,
-      channelId: settings.facebookLiveVideoId,
-      userId: settings.facebookPageId ?? ''
-    }).catch(err => console.error('Auto-connect failed (facebook):', err))
-  }
-}
-
-app.setAsDefaultProtocolClient('streamline')
-
-// macOS: OS delivers the custom-scheme URL via open-url
-app.on('open-url', (event, url) => {
-  event.preventDefault()
-  if (url.startsWith('streamline://auth/twitch')) handleOAuthCallback(url)
-  else if (url.startsWith('streamline://auth/youtube')) handleYouTubeOAuthCallback(url)
-})
-
-// Windows: app relaunched as second instance with URL in argv
-app.on('second-instance', (_event, argv) => {
-  const url = argv.find(arg => arg.startsWith('streamline://auth/'))
-  if (url) handleOAuthCallback(url)
-})
-
-app.whenReady().then(main)
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })

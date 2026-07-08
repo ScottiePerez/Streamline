@@ -7,7 +7,6 @@ const PLATFORMS: { id: Platform; label: string; dot: string }[] = [
   { id: 'youtube', label: 'YouTube', dot: 'bg-red-400' },
   { id: 'kick', label: 'Kick', dot: 'bg-green-400' },
   { id: 'tiktok', label: 'TikTok', dot: 'bg-gray-400' },
-  { id: 'facebook', label: 'Facebook', dot: 'bg-blue-400' }
 ]
 
 interface Props {

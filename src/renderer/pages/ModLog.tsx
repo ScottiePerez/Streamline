@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import type { ModerationAction, Platform } from '../../shared/types'
 
-const PLATFORMS: Platform[] = ['twitch', 'youtube', 'kick', 'tiktok', 'facebook']
 
 const PLATFORM_COLORS: Record<Platform, string> = {
   twitch: 'bg-purple-600',
   youtube: 'bg-red-600',
   kick: 'bg-green-600',
   tiktok: 'bg-gray-600',
-  facebook: 'bg-blue-600'
 }
 
 const ACTION_COLORS: Record<ModerationAction['type'], string> = {

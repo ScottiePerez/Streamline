@@ -24,7 +24,6 @@ const PLATFORM_AVATAR_COLOR: Record<string, string> = {
   youtube: 'bg-red-500/20 text-red-300',
   kick: 'bg-green-500/20 text-green-300',
   tiktok: 'bg-gray-500/20 text-gray-300',
-  facebook: 'bg-blue-500/20 text-blue-300'
 }
 
 const PLATFORM_NAME_COLOR: Record<string, string> = {
@@ -32,7 +31,6 @@ const PLATFORM_NAME_COLOR: Record<string, string> = {
   youtube: 'text-red-400',
   kick: 'text-green-400',
   tiktok: 'text-gray-300',
-  facebook: 'text-blue-400'
 }
 
 function formatTime(timestamp: number): string {

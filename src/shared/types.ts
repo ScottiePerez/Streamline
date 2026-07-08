@@ -1,4 +1,4 @@
-export type Platform = 'twitch' | 'youtube' | 'kick' | 'tiktok' | 'facebook'
+export type Platform = 'twitch' | 'youtube' | 'kick' | 'tiktok'
 
 export interface Badge {
   id: string
@@ -70,8 +70,6 @@ export interface AppSettings {
   youtubeChannelId?: string
   kickChannelId?: string
   tiktokChannelId?: string
-  facebookLiveVideoId?: string
-  facebookPageId?: string
   twitchUsername?: string
   youtubeDisplayName?: string
   kickDisplayName?: string
@@ -87,14 +85,12 @@ export const DEFAULT_SETTINGS: AppSettings = {
     youtube: false,
     kick: false,
     tiktok: false,
-    facebook: false
   },
   notificationSoundPaths: {
     twitch: null,
     youtube: null,
     kick: null,
     tiktok: null,
-    facebook: null
   },
   teamModeEnabled: false,
   teamModePort: 7350,
@@ -102,6 +98,4 @@ export const DEFAULT_SETTINGS: AppSettings = {
   youtubeChannelId: '',
   kickChannelId: '',
   tiktokChannelId: '',
-  facebookLiveVideoId: '',
-  facebookPageId: ''
 }

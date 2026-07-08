@@ -16,11 +16,9 @@ export default function App(): React.JSX.Element {
   const [filters, setFilters] = useState<ChatFilters>({})
   const [channelId, setChannelId] = useState('')
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md')
-  const [notificationSounds, setNotificationSounds] = useState<Record<Platform, boolean>>({
-    twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
+  const [notificationSounds, setNotificationSounds] = useState<Record<Platform, boolean>>({ twitch: false, youtube: false, kick: false, tiktok: false 
   })
-  const [notificationSoundPaths, setNotificationSoundPaths] = useState<Record<Platform, string | null>>({
-    twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
+  const [notificationSoundPaths, setNotificationSoundPaths] = useState<Record<Platform, string | null>>({ twitch: null, youtube: null, kick: null, tiktok: null 
   })
 
   useEffect(() => {
