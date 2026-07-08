@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react'
 import { useChat } from '../../../src/renderer/hooks/useChat'
-import type { ChatMessage } from '../../../src/shared/types'
+import type { ChatMessage, Platform } from '../../../src/shared/types'
+
+jest.mock('../../../src/renderer/assets/notify.mp3', () => 'notify.mp3', { virtual: true })
 
 const mockMsg = (overrides: Partial<ChatMessage> = {}): ChatMessage => ({
   id: 'msg1', platform: 'twitch', channelId: 'chan1', userId: 'u1',
@@ -73,5 +75,49 @@ describe('useChat', () => {
     const { unmount } = renderHook(() => useChat({}))
     unmount()
     expect(mockUnsubscribe).toHaveBeenCalled()
+  })
+})
+
+const ALL_OFF: Record<Platform, boolean> = {
+  twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
+}
+
+describe('useChat — notification sounds', () => {
+  it('does not play sound when platform sound is disabled', async () => {
+    const mockPlay = jest.fn().mockResolvedValue(undefined)
+    ;(global as any).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+
+    renderHook(() => useChat({}, ALL_OFF))
+    await act(async () => {
+      const handler = (window as unknown as Record<string, Function>)._chatHandler
+      handler(mockMsg({ platform: 'twitch' }))
+    })
+    expect(mockPlay).not.toHaveBeenCalled()
+  })
+
+  it('plays sound when platform sound is enabled and message arrives', async () => {
+    const mockPlay = jest.fn().mockResolvedValue(undefined)
+    const MockAudio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+    ;(global as any).Audio = MockAudio
+
+    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }))
+    await act(async () => {
+      const handler = (window as unknown as Record<string, Function>)._chatHandler
+      handler(mockMsg({ platform: 'twitch' }))
+    })
+    expect(MockAudio).toHaveBeenCalledWith('notify.mp3')
+    expect(mockPlay).toHaveBeenCalled()
+  })
+
+  it('does not play sound for a different platform that is disabled', async () => {
+    const mockPlay = jest.fn().mockResolvedValue(undefined)
+    ;(global as any).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+
+    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }))
+    await act(async () => {
+      const handler = (window as unknown as Record<string, Function>)._chatHandler
+      handler(mockMsg({ platform: 'youtube' }))
+    })
+    expect(mockPlay).not.toHaveBeenCalled()
   })
 })

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChatMessage, Platform } from '../../shared/types'
+import notifySound from '../assets/notify.mp3'
 
 export interface ChatFilters {
   platforms?: Platform[]
@@ -22,10 +23,21 @@ function matchesFilters(msg: ChatMessage, filters: ChatFilters): boolean {
 
 const MAX_FEED_MESSAGES = 500
 
-export function useChat(filters: ChatFilters): { messages: ChatMessage[] } {
+export function useChat(
+  filters: ChatFilters,
+  notificationSounds: Record<Platform, boolean> = {
+    twitch: false,
+    youtube: false,
+    kick: false,
+    tiktok: false,
+    facebook: false
+  }
+): { messages: ChatMessage[] } {
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([])
   const filtersRef = useRef(filters)
   filtersRef.current = filters
+  const soundsRef = useRef(notificationSounds)
+  soundsRef.current = notificationSounds
 
   useEffect(() => {
     window.electronAPI.getRecentMessages(MAX_FEED_MESSAGES).then(history => {
@@ -39,12 +51,15 @@ export function useChat(filters: ChatFilters): { messages: ChatMessage[] } {
         const next = [msg, ...prev]
         return next.length > MAX_FEED_MESSAGES ? next.slice(0, MAX_FEED_MESSAGES) : next
       })
+      if (soundsRef.current[msg.platform]) {
+        new Audio(notifySound).play().catch(() => {})
+      }
     })
     return unsub
   }, [])
 
   const messages = useMemo(
-    () => allMessages.filter(msg => matchesFilters(msg, filters)),
+    () => allMessages.filter(msg => matchesFilters(msg, filtersRef.current)),
     [allMessages, filters]
   )
 

@@ -26,7 +26,8 @@ const config: Config = {
         '^keytar$': '<rootDir>/tests/__mocks__/keytar.ts',
         '^googleapis$': '<rootDir>/tests/__mocks__/googleapis.ts',
         '^pusher-js$': '<rootDir>/tests/__mocks__/pusher-js.ts',
-        '^tiktok-live-connector$': '<rootDir>/tests/__mocks__/tiktok-live-connector.ts'
+        '^tiktok-live-connector$': '<rootDir>/tests/__mocks__/tiktok-live-connector.ts',
+        '\\.(mp3)$': '<rootDir>/tests/__mocks__/fileMock.ts'
       }
     }
   ]
