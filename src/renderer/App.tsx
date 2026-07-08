@@ -43,7 +43,7 @@ export default function App(): React.JSX.Element {
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 overflow-hidden">
       <Sidebar activeView={view} onViewChange={setView} />
       <main className="flex-1 flex flex-col overflow-hidden">
         {view === 'chat' && (

@@ -26,7 +26,7 @@ export default function FilterBar({ filters, onChange }: Props): React.JSX.Eleme
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-800 bg-gray-950">
+    <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
       {PLATFORMS.map(({ id, label, color }) => (
         <button
           key={id}
@@ -46,7 +46,7 @@ export default function FilterBar({ filters, onChange }: Props): React.JSX.Eleme
         placeholder="Search messages…"
         value={filters.keyword ?? ''}
         onChange={e => onChange({ ...filters, keyword: e.target.value })}
-        className="ml-auto bg-gray-800 text-gray-200 placeholder-gray-500 text-sm px-3 py-1 rounded border border-gray-700 focus:outline-none focus:border-indigo-500 w-48"
+        className="ml-auto bg-white text-gray-800 placeholder-gray-400 text-sm px-3 py-1 rounded border border-gray-300 focus:outline-none focus:border-indigo-500 w-48 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 dark:border-gray-700"
       />
     </div>
   )

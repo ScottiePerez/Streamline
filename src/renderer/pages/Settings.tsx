@@ -15,7 +15,7 @@ const PLATFORMS: { id: Platform; label: string }[] = [
 
 function SectionHeading({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
-    <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+    <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
       {children}
     </h2>
   )
@@ -38,7 +38,7 @@ function Toggle({ checked, onChange, id, ariaLabelledBy }: ToggleProps): React.J
       aria-labelledby={ariaLabelledBy}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-        checked ? 'bg-indigo-600' : 'bg-gray-600'
+        checked ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
       }`}
     >
       <span
@@ -73,16 +73,16 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
 
   return (
     <div className="flex-1 overflow-y-auto p-6">
-      <h1 className="text-xl font-bold text-gray-100 mb-6">Settings</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Settings</h1>
       <div className="flex flex-col gap-8 max-w-xl">
 
         {/* Appearance */}
         <section>
           <SectionHeading>Appearance</SectionHeading>
-          <div className="bg-gray-800 rounded-lg px-4 py-4 border border-gray-700 flex flex-col gap-4">
+          <div className="bg-white rounded-lg px-4 py-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-200">Theme</span>
-              <div className="flex rounded overflow-hidden border border-gray-600">
+              <span className="text-sm text-gray-700 dark:text-gray-200">Theme</span>
+              <div className="flex rounded overflow-hidden border border-gray-300 dark:border-gray-600">
                 {(['dark', 'light'] as const).map(t => (
                   <button
                     key={t}
@@ -94,7 +94,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
                     className={`px-3 py-1 text-sm capitalize ${
                       settings.theme === t
                         ? 'bg-indigo-600 text-white'
-                        : 'text-gray-400 hover:bg-gray-700'
+                        : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
                     }`}
                   >
                     {t === 'dark' ? 'Dark' : 'Light'}
@@ -103,8 +103,8 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-200">Font size</span>
-              <div className="flex rounded overflow-hidden border border-gray-600">
+              <span className="text-sm text-gray-700 dark:text-gray-200">Font size</span>
+              <div className="flex rounded overflow-hidden border border-gray-300 dark:border-gray-600">
                 {([['sm', 'Small'], ['md', 'Medium'], ['lg', 'Large']] as const).map(([val, label]) => (
                   <button
                     key={val}
@@ -112,7 +112,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
                     className={`px-3 py-1 text-sm ${
                       settings.fontSize === val
                         ? 'bg-indigo-600 text-white'
-                        : 'text-gray-400 hover:bg-gray-700'
+                        : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
                     }`}
                   >
                     {label}
@@ -126,9 +126,9 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
         {/* Feed */}
         <section>
           <SectionHeading>Feed</SectionHeading>
-          <div className="bg-gray-800 rounded-lg px-4 py-4 border border-gray-700">
+          <div className="bg-white rounded-lg px-4 py-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center justify-between gap-4">
-              <label htmlFor="max-messages" className="text-sm text-gray-200">
+              <label htmlFor="max-messages" className="text-sm text-gray-700 dark:text-gray-200">
                 Max messages per platform
               </label>
               <input
@@ -140,7 +140,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
                 step={100}
                 defaultValue={settings.maxMessagesPerPlatform}
                 onBlur={e => save({ maxMessagesPerPlatform: Number(e.currentTarget.value) })}
-                className="w-28 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
+                className="w-28 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
             <p className="mt-1 text-xs text-gray-500">Takes effect on next app launch.</p>
@@ -150,10 +150,10 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
         {/* Notification Sounds */}
         <section>
           <SectionHeading>Notification Sounds</SectionHeading>
-          <div className="bg-gray-800 rounded-lg border border-gray-700 divide-y divide-gray-700">
+          <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:divide-gray-700">
             {PLATFORMS.map(({ id, label }) => (
               <div key={id} className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-gray-200">{label}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
                 <Toggle
                   id={label.toLowerCase()}
                   checked={settings.notificationSounds[id]}
@@ -169,9 +169,9 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
         {/* Team Mode */}
         <section>
           <SectionHeading>Team Mode</SectionHeading>
-          <div className="bg-gray-800 rounded-lg px-4 py-4 border border-gray-700 flex flex-col gap-4">
+          <div className="bg-white rounded-lg px-4 py-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <span id="team-mode-label" className="text-sm text-gray-200">
+              <span id="team-mode-label" className="text-sm text-gray-700 dark:text-gray-200">
                 Enable team mode
               </span>
               <Toggle
@@ -184,7 +184,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
             <div className="flex items-center justify-between gap-4">
               <label
                 htmlFor="team-mode-port"
-                className={`text-sm ${settings.teamModeEnabled ? 'text-gray-200' : 'text-gray-500'}`}
+                className={`text-sm ${settings.teamModeEnabled ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500'}`}
               >
                 Port
               </label>
@@ -197,7 +197,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
                 defaultValue={settings.teamModePort}
                 disabled={!settings.teamModeEnabled}
                 onBlur={e => save({ teamModePort: Number(e.currentTarget.value) })}
-                className="w-24 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 focus:outline-none focus:border-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-24 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
             <p className="text-xs text-gray-500">

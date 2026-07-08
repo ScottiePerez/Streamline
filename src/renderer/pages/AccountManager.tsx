@@ -96,7 +96,7 @@ export default function AccountManager(): React.JSX.Element {
 
   return (
     <div className="flex-1 overflow-y-auto p-6">
-      <h1 className="text-xl font-bold text-gray-100 mb-6">Connected Accounts</h1>
+      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Connected Accounts</h1>
       <div className="flex flex-col gap-4 max-w-xl">
         {PLATFORMS.map(({ id, label, color, note, channelFields }) => {
           const hasToken = !!tokens[id]
@@ -105,14 +105,14 @@ export default function AccountManager(): React.JSX.Element {
           return (
             <div
               key={id}
-              className="bg-gray-800 rounded-lg px-4 py-3 border border-gray-700"
+              className="bg-white rounded-lg px-4 py-3 border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
             >
               <div className="flex items-center gap-4">
                 <span className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold text-white ${color}`}>
                   {label[0]}
                 </span>
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-100">{label}</div>
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">{label}</div>
                   <div className={`text-xs ${STATUS_COLORS[status]}`}>
                     {status}{note ? ` · ${note}` : ''}
                   </div>
@@ -120,7 +120,7 @@ export default function AccountManager(): React.JSX.Element {
                 {hasToken ? (
                   <button
                     onClick={() => void handleDisconnect(id)}
-                    className="px-3 py-1 text-sm text-red-400 border border-red-800 rounded hover:bg-red-950"
+                    className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950"
                   >
                     Disconnect
                   </button>
@@ -141,7 +141,7 @@ export default function AccountManager(): React.JSX.Element {
                     placeholder={placeholder}
                     defaultValue={(channelIds[key] as string | undefined) ?? ''}
                     onBlur={e => handleChannelIdBlur(key, e.currentTarget.value)}
-                    className="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500"
                   />
                 ))}
               </div>

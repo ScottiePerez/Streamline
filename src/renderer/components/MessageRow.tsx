@@ -36,27 +36,27 @@ export default function MessageRow({ message, onModerate, fontSize }: Props): Re
       data-testid="message-row"
       onContextMenu={handleContextMenu}
       onClick={() => setMenuOpen(false)}
-      className={`relative flex items-start gap-2 px-3 py-1.5 hover:bg-gray-800 group text-sm ${
+      className={`relative flex items-start gap-2 px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 group text-sm ${
         message.isDeleted ? 'opacity-40 line-through' : ''
       }`}
     >
       <PlatformBadge platform={message.platform} />
-      <span className="font-semibold text-indigo-300 shrink-0">{message.displayName}</span>
-      <span className={`${FONT_SIZE_CLASS[fontSize]} text-gray-300 break-words min-w-0`}>{message.text}</span>
-      <span className="ml-auto text-xs text-gray-600 shrink-0 opacity-0 group-hover:opacity-100">
+      <span className="font-semibold text-indigo-600 dark:text-indigo-300 shrink-0">{message.displayName}</span>
+      <span className={`${FONT_SIZE_CLASS[fontSize]} text-gray-700 dark:text-gray-300 break-words min-w-0`}>{message.text}</span>
+      <span className="ml-auto text-xs text-gray-400 dark:text-gray-600 shrink-0 opacity-0 group-hover:opacity-100">
         {formatTime(message.timestamp)}
       </span>
 
       {menuOpen && (
-        <div className="absolute right-0 top-full z-50 bg-gray-800 border border-gray-700 rounded shadow-lg py-1 text-sm min-w-36">
+        <div className="absolute right-0 top-full z-50 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded shadow-lg py-1 text-sm min-w-36">
           <button
-            className="w-full text-left px-3 py-1.5 hover:bg-gray-700"
+            className="w-full text-left px-3 py-1.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => { onModerate({ type: 'delete', message }); setMenuOpen(false) }}
           >
             Delete message
           </button>
           <button
-            className="w-full text-left px-3 py-1.5 hover:bg-gray-700"
+            className="w-full text-left px-3 py-1.5 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => { onModerate({ type: 'timeout', message }); setMenuOpen(false) }}
           >
             Timeout (10 min)

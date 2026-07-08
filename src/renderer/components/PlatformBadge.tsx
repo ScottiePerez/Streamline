@@ -5,7 +5,7 @@ const PLATFORM_COLORS: Record<Platform, string> = {
   twitch: 'bg-purple-600',
   youtube: 'bg-red-600',
   kick: 'bg-green-500',
-  tiktok: 'bg-gray-900 border border-gray-600',
+  tiktok: 'bg-gray-600',
   facebook: 'bg-blue-600'
 }
 

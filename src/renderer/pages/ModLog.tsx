@@ -55,13 +55,13 @@ export default function ModLog(): React.JSX.Element {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="flex items-center gap-4 p-4 border-b border-gray-800 bg-gray-900">
-        <label className="flex items-center gap-2 text-sm text-gray-400">
+      <div className="flex items-center gap-4 p-4 border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900">
+        <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           Platform
           <select
             value={platform}
             onChange={e => setPlatform(e.target.value as Platform | 'all')}
-            className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm"
+            className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-800 text-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
           >
             <option value="all">All</option>
             {PLATFORMS.map(p => (
@@ -69,14 +69,14 @@ export default function ModLog(): React.JSX.Element {
             ))}
           </select>
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-400">
+        <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           Username
           <input
             type="text"
             value={username}
             onChange={e => setUsername(e.target.value)}
             placeholder="Filter by username"
-            className="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm w-48"
+            className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-800 text-sm w-48 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
           />
         </label>
       </div>
@@ -88,8 +88,8 @@ export default function ModLog(): React.JSX.Element {
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-900 sticky top-0">
-              <tr className="text-left text-gray-400 border-b border-gray-800">
+            <thead className="bg-gray-50 dark:bg-gray-900 sticky top-0">
+              <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
                 <th className="px-4 py-2 font-medium">Platform</th>
                 <th className="px-4 py-2 font-medium">Action</th>
                 <th className="px-4 py-2 font-medium">User</th>
@@ -101,7 +101,7 @@ export default function ModLog(): React.JSX.Element {
             <tbody>
               {filtered.map(action => (
                 <React.Fragment key={action.id}>
-                  <tr className="border-b border-gray-800 hover:bg-gray-800/40">
+                  <tr className="border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40">
                     <td className="px-4 py-2">
                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium text-white ${PLATFORM_COLORS[action.platform]}`}>
                         {capitalize(action.platform)}
@@ -112,9 +112,9 @@ export default function ModLog(): React.JSX.Element {
                         {ACTION_LABELS[action.type]}
                       </span>
                     </td>
-                    <td className="px-4 py-2 text-gray-100">{action.targetUsername}</td>
-                    <td className="px-4 py-2 text-gray-400">{action.moderatorName}</td>
-                    <td className="px-4 py-2 text-gray-400 whitespace-nowrap">
+                    <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{action.targetUsername}</td>
+                    <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{action.moderatorName}</td>
+                    <td className="px-4 py-2 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                       {new Date(action.timestamp).toLocaleString()}
                     </td>
                     <td className="px-4 py-2">
@@ -122,7 +122,7 @@ export default function ModLog(): React.JSX.Element {
                         onClick={() => handleUndo(action)}
                         disabled={action.type === 'delete'}
                         title={action.type === 'delete' ? 'Cannot undo message delete' : 'Undo'}
-                        className="px-3 py-1 text-xs rounded bg-gray-700 text-gray-200 hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="px-3 py-1 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                       >
                         Undo
                       </button>

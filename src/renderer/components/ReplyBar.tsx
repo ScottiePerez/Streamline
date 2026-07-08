@@ -36,7 +36,7 @@ export default function ReplyBar({ channelId }: Props): React.JSX.Element {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-3 py-2 border-t border-gray-800 bg-gray-950">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-3 py-2 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
       <div className="flex gap-1">
         {ALL_PLATFORMS.map(p => (
           <button
@@ -57,7 +57,7 @@ export default function ReplyBar({ channelId }: Props): React.JSX.Element {
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="Send a message…"
-        className="flex-1 bg-gray-800 text-gray-200 placeholder-gray-500 text-sm px-3 py-1.5 rounded border border-gray-700 focus:outline-none focus:border-indigo-500"
+        className="flex-1 bg-white text-gray-800 placeholder-gray-400 text-sm px-3 py-1.5 rounded border border-gray-300 focus:outline-none focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 dark:border-gray-700"
       />
       <button
         type="submit"
