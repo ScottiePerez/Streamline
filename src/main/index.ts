@@ -3,9 +3,31 @@ import { join } from 'path'
 import { openDb } from './store/db'
 import { ChatBus } from './chat-bus'
 import { TwitchAdapter } from './adapters/twitch'
+import { YouTubeAdapter } from './adapters/youtube'
+import { KickAdapter } from './adapters/kick'
+import { TikTokAdapter } from './adapters/tiktok'
+import { FacebookAdapter } from './adapters/facebook'
 import { registerIpcHandlers } from './ipc-handlers'
 import { getToken } from './auth/keychain'
 import { getSettings } from './store/settings'
+import type { Platform, Credentials } from '../shared/types'
+
+async function tryConnect(
+  bus: ChatBus,
+  platform: Platform,
+  credentials: Credentials
+): Promise<void> {
+  const adapters = {
+    twitch: () => new TwitchAdapter(),
+    youtube: () => new YouTubeAdapter(),
+    kick: () => new KickAdapter(),
+    tiktok: () => new TikTokAdapter(),
+    facebook: () => new FacebookAdapter()
+  }
+  const adapter = adapters[platform]()
+  bus.registerAdapter(adapter)
+  await adapter.connect(credentials)
+}
 
 async function main(): Promise<void> {
   const db = openDb(join(app.getPath('userData'), 'streamchat.db'))
@@ -32,19 +54,52 @@ async function main(): Promise<void> {
     win.loadFile(join(__dirname, '../../dist/index.html'))
   }
 
-  // Auto-connect Twitch if token exists
+  const settings = getSettings(db)
+
   const twitchToken = await getToken('twitch')
-  if (twitchToken) {
-    const settings = getSettings(db)
-    const adapter = new TwitchAdapter()
-    bus.registerAdapter(adapter)
-    // channelId will come from settings in a future task; use a placeholder for now
-    const channelId = (settings as unknown as Record<string, string>)['twitchChannelId'] ?? ''
-    if (channelId) {
-      adapter.connect({ platform: 'twitch', token: twitchToken, channelId }).catch(err => {
-        console.error('Twitch auto-connect failed:', err)
-      })
-    }
+  if (twitchToken && settings.twitchChannelId) {
+    tryConnect(bus, 'twitch', {
+      platform: 'twitch',
+      token: twitchToken,
+      channelId: settings.twitchChannelId
+    }).catch(err => console.error('Auto-connect failed (twitch):', err))
+  }
+
+  const youtubeToken = await getToken('youtube')
+  if (youtubeToken && settings.youtubeChannelId) {
+    tryConnect(bus, 'youtube', {
+      platform: 'youtube',
+      token: youtubeToken,
+      channelId: settings.youtubeChannelId
+    }).catch(err => console.error('Auto-connect failed (youtube):', err))
+  }
+
+  const kickToken = await getToken('kick')
+  if (kickToken && settings.kickChannelId) {
+    tryConnect(bus, 'kick', {
+      platform: 'kick',
+      token: kickToken,
+      channelId: settings.kickChannelId
+    }).catch(err => console.error('Auto-connect failed (kick):', err))
+  }
+
+  const tiktokToken = await getToken('tiktok')
+  if (tiktokToken && settings.tiktokChannelId) {
+    tryConnect(bus, 'tiktok', {
+      platform: 'tiktok',
+      token: tiktokToken ?? '',
+      channelId: settings.tiktokChannelId
+    }).catch(err => console.error('Auto-connect failed (tiktok):', err))
+  }
+
+  const facebookToken = await getToken('facebook')
+  if (facebookToken && settings.facebookLiveVideoId) {
+    tryConnect(bus, 'facebook', {
+      platform: 'facebook',
+      token: facebookToken,
+      channelId: settings.facebookLiveVideoId,
+      userId: settings.facebookPageId ?? ''
+    }).catch(err => console.error('Auto-connect failed (facebook):', err))
   }
 }
 
