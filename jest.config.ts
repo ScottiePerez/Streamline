@@ -8,7 +8,8 @@ const config: Config = {
       testMatch: ['<rootDir>/tests/main/**/*.test.ts'],
       transform: { '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.node.json' }] },
       moduleNameMapper: {
-        '^electron$': '<rootDir>/tests/__mocks__/electron.ts'
+        '^electron$': '<rootDir>/tests/__mocks__/electron.ts',
+        '^keytar$': '<rootDir>/tests/__mocks__/keytar.ts'
       }
     },
     {
@@ -18,7 +19,8 @@ const config: Config = {
       transform: { '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.web.json' }] },
       setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
       moduleNameMapper: {
-        '^electron$': '<rootDir>/tests/__mocks__/electron.ts'
+        '^electron$': '<rootDir>/tests/__mocks__/electron.ts',
+        '^keytar$': '<rootDir>/tests/__mocks__/keytar.ts'
       }
     }
   ]
