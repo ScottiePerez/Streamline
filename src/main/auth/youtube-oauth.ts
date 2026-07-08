@@ -1,6 +1,8 @@
 import { createHash, randomBytes } from 'crypto'
 import { shell } from 'electron'
 
+export const YOUTUBE_CLIENT_ID = '605422511473-oqbu9n95ra1s7q8kspgg8pjlm40qrp07.apps.googleusercontent.com'
+
 const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl'
 const REDIRECT_URI = 'https://scottieperez.github.io/Streamline/callback'
 const TIMEOUT_MS = 5 * 60 * 1000
@@ -18,7 +20,7 @@ function generatePkce(): { codeVerifier: string; codeChallenge: string } {
   return { codeVerifier, codeChallenge }
 }
 
-export async function startYouTubeOAuth(clientId: string): Promise<{ token: string; channelId: string; displayName: string }> {
+export async function startYouTubeOAuth(clientId: string = YOUTUBE_CLIENT_ID): Promise<{ token: string; channelId: string; displayName: string }> {
   const { codeVerifier, codeChallenge } = generatePkce()
 
   const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')

@@ -45,9 +45,6 @@ export default function AccountManager(): React.JSX.Element {
   const [kick, setKick] = usePlatformState('kick')
   const [tiktok, setTikTok] = usePlatformState('tiktok')
 
-  // YouTube client ID input
-  const [youtubeClientId, setYoutubeClientId] = useState('')
-  const [showYouTubeClientId, setShowYouTubeClientId] = useState(false)
 
   useEffect(() => {
     void (async () => {
@@ -105,14 +102,11 @@ export default function AccountManager(): React.JSX.Element {
   }
 
   async function connectYouTube(): Promise<void> {
-    const clientId = youtubeClientId.trim()
-    if (!clientId) { setShowYouTubeClientId(true); return }
     setYouTube(prev => ({ ...prev, error: '', connecting: true }))
     try {
-      const { channelId, displayName } = await window.electronAPI.startYouTubeOAuth(clientId)
-      void window.electronAPI.setSettings({ youtubeClientId: clientId, youtubeChannelId: channelId })
+      const { channelId, displayName } = await window.electronAPI.startYouTubeOAuth()
+      void window.electronAPI.setSettings({ youtubeChannelId: channelId })
       setYouTube(prev => ({ ...prev, hasToken: true, displayName, connecting: false }))
-      setShowYouTubeClientId(false)
     } catch (e) {
       setYouTube(prev => ({ ...prev, error: (e as Error).message, connecting: false }))
     }
@@ -180,20 +174,6 @@ export default function AccountManager(): React.JSX.Element {
           status={platformStatus('youtube', youtube)} state={youtube}
           onConnect={connectYouTube} onDisconnect={() => void disconnect('youtube')}
         >
-          {showYouTubeClientId && !youtube.hasToken && (
-            <div className="mb-1.5">
-              <input
-                type="text"
-                placeholder="Google OAuth Client ID"
-                value={youtubeClientId}
-                onChange={e => setYoutubeClientId(e.target.value)}
-                className="w-full bg-gray-900/60 border border-white/8 rounded-lg px-3 py-1.5 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500/60 transition-colors"
-              />
-              <p className="text-[10px] text-gray-600 mt-1">
-                Create one at <span className="text-indigo-400">console.cloud.google.com</span> → APIs &amp; Services → Credentials → Desktop OAuth client
-              </p>
-            </div>
-          )}
           <ChannelInput placeholder="YouTube channel ID" value={settings.youtubeChannelId ?? ''} onSave={v => saveChannelId('youtubeChannelId', v)} />
         </PlatformCard>
 

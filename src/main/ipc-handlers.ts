@@ -69,8 +69,8 @@ export function registerIpcHandlers(
     return username
   })
 
-  ipcMain.handle('youtube:startOAuth', async (_e, clientId: string) => {
-    const { token, channelId, displayName } = await startYouTubeOAuth(clientId)
+  ipcMain.handle('youtube:startOAuth', async () => {
+    const { token, channelId, displayName } = await startYouTubeOAuth()
     await setToken('youtube', token)
     setSettings(db, { youtubeChannelId: channelId, youtubeDisplayName: displayName })
     return { channelId, displayName }

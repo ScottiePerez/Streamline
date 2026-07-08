@@ -65,8 +65,8 @@ const electronAPI = {
     return ipcRenderer.invoke('twitch:startOAuth')
   },
 
-  startYouTubeOAuth(clientId: string): Promise<{ channelId: string; displayName: string }> {
-    return ipcRenderer.invoke('youtube:startOAuth', clientId)
+  startYouTubeOAuth(): Promise<{ channelId: string; displayName: string }> {
+    return ipcRenderer.invoke('youtube:startOAuth')
   },
 
   connectKick(slug: string): Promise<{ username: string; displayName: string }> {
