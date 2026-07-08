@@ -9,9 +9,8 @@ directories:
 files:
   - out/**/*
   - package.json
-  - "!node_modules/**"
-
-extraResources: []
+  - node_modules/better-sqlite3/build/Release/better_sqlite3.node
+  - node_modules/keytar/build/Release/keytar.node
 
 asarUnpack:
   - "**/*.node"
