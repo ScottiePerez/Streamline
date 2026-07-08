@@ -24,4 +24,8 @@ const BrowserWindow = jest.fn().mockImplementation(() => ({
   on: jest.fn()
 }))
 
-export { ipcRenderer, ipcMain, app, BrowserWindow }
+const shell = {
+  openExternal: jest.fn().mockResolvedValue(undefined)
+}
+
+export { ipcRenderer, ipcMain, app, BrowserWindow, shell }
