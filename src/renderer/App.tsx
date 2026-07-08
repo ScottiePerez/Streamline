@@ -17,11 +17,10 @@ export default function App(): React.JSX.Element {
   const [channelId, setChannelId] = useState('')
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md')
   const [notificationSounds, setNotificationSounds] = useState<Record<Platform, boolean>>({
-    twitch: false,
-    youtube: false,
-    kick: false,
-    tiktok: false,
-    facebook: false
+    twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
+  })
+  const [notificationSoundPaths, setNotificationSoundPaths] = useState<Record<Platform, string | null>>({
+    twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
   })
 
   useEffect(() => {
@@ -29,6 +28,7 @@ export default function App(): React.JSX.Element {
       setChannelId(s.twitchChannelId ?? '')
       setFontSize(s.fontSize)
       setNotificationSounds(s.notificationSounds)
+      if (s.notificationSoundPaths) setNotificationSoundPaths(s.notificationSoundPaths)
       if (s.theme === 'light') {
         document.documentElement.classList.remove('dark')
       } else {
@@ -40,6 +40,7 @@ export default function App(): React.JSX.Element {
   function handleSettingsChange(partial: Partial<AppSettings>): void {
     if (partial.fontSize !== undefined) setFontSize(partial.fontSize)
     if (partial.notificationSounds !== undefined) setNotificationSounds(partial.notificationSounds)
+    if (partial.notificationSoundPaths !== undefined) setNotificationSoundPaths(partial.notificationSoundPaths)
   }
 
   return (
@@ -49,7 +50,12 @@ export default function App(): React.JSX.Element {
         {view === 'chat' && (
           <>
             <FilterBar filters={filters} onChange={setFilters} />
-            <ChatFeed filters={filters} fontSize={fontSize} notificationSounds={notificationSounds} />
+            <ChatFeed
+              filters={filters}
+              fontSize={fontSize}
+              notificationSounds={notificationSounds}
+              notificationSoundPaths={notificationSoundPaths}
+            />
             {channelId ? (
               <ReplyBar channelId={channelId} />
             ) : (

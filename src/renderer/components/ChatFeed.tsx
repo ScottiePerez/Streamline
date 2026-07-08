@@ -8,14 +8,14 @@ interface Props {
   filters: ChatFilters
   fontSize: 'sm' | 'md' | 'lg'
   notificationSounds: Record<Platform, boolean>
+  notificationSoundPaths: Record<Platform, string | null>
 }
 
-export default function ChatFeed({ filters, fontSize, notificationSounds }: Props): React.JSX.Element {
-  const { messages } = useChat(filters, notificationSounds)
+export default function ChatFeed({ filters, fontSize, notificationSounds, notificationSoundPaths }: Props): React.JSX.Element {
+  const { messages } = useChat(filters, notificationSounds, notificationSoundPaths)
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll when new messages arrive, unless user has scrolled up
   useEffect(() => {
     const container = containerRef.current
     if (!container) return

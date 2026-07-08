@@ -1,8 +1,11 @@
 import { renderHook, act } from '@testing-library/react'
 import { useChat } from '../../../src/renderer/hooks/useChat'
 import type { ChatMessage, Platform } from '../../../src/shared/types'
+import { playDefaultTone } from '../../../src/renderer/audio/tones'
 
-jest.mock('../../../src/renderer/assets/notify.mp3', () => 'notify.mp3', { virtual: true })
+jest.mock('../../../src/renderer/audio/tones', () => ({
+  playDefaultTone: jest.fn()
+}))
 
 const mockMsg = (overrides: Partial<ChatMessage> = {}): ChatMessage => ({
   id: 'msg1', platform: 'twitch', channelId: 'chan1', userId: 'u1',
@@ -13,6 +16,7 @@ const mockMsg = (overrides: Partial<ChatMessage> = {}): ChatMessage => ({
 const mockUnsubscribe = jest.fn()
 
 beforeEach(() => {
+  jest.clearAllMocks()
   window.electronAPI = {
     onMessage: jest.fn((handler) => {
       (window as unknown as Record<string, unknown>)._chatHandler = handler
@@ -93,43 +97,59 @@ describe('useChat', () => {
 const ALL_OFF: Record<Platform, boolean> = {
   twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
 }
+const ALL_NULL: Record<Platform, string | null> = {
+  twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
+}
 
 describe('useChat — notification sounds', () => {
   it('does not play sound when platform sound is disabled', async () => {
     const mockPlay = jest.fn().mockResolvedValue(undefined)
-    ;(global as any).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+    ;(global as unknown as Record<string, unknown>).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
 
-    renderHook(() => useChat({}, ALL_OFF))
+    renderHook(() => useChat({}, ALL_OFF, ALL_NULL))
     await act(async () => {
       const handler = (window as unknown as Record<string, Function>)._chatHandler
       handler(mockMsg({ platform: 'twitch' }))
     })
     expect(mockPlay).not.toHaveBeenCalled()
+    expect(playDefaultTone).not.toHaveBeenCalled()
   })
 
-  it('plays sound when platform sound is enabled and message arrives', async () => {
-    const mockPlay = jest.fn().mockResolvedValue(undefined)
-    const MockAudio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
-    ;(global as any).Audio = MockAudio
-
-    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }))
+  it('plays default tone when sound enabled and no custom path', async () => {
+    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }, ALL_NULL))
     await act(async () => {
       const handler = (window as unknown as Record<string, Function>)._chatHandler
       handler(mockMsg({ platform: 'twitch' }))
     })
-    expect(MockAudio).toHaveBeenCalledWith('notify.mp3')
+    expect(playDefaultTone).toHaveBeenCalledWith('twitch')
+  })
+
+  it('plays custom file when custom path is set', async () => {
+    const mockPlay = jest.fn().mockResolvedValue(undefined)
+    const MockAudio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+    ;(global as unknown as Record<string, unknown>).Audio = MockAudio
+
+    const paths = { ...ALL_NULL, twitch: '/userData/sounds/twitch.mp3' }
+    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }, paths))
+    await act(async () => {
+      const handler = (window as unknown as Record<string, Function>)._chatHandler
+      handler(mockMsg({ platform: 'twitch' }))
+    })
+    expect(MockAudio).toHaveBeenCalledWith('file:///userData/sounds/twitch.mp3')
     expect(mockPlay).toHaveBeenCalled()
+    expect(playDefaultTone).not.toHaveBeenCalled()
   })
 
   it('does not play sound for a different platform that is disabled', async () => {
     const mockPlay = jest.fn().mockResolvedValue(undefined)
-    ;(global as any).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
+    ;(global as unknown as Record<string, unknown>).Audio = jest.fn().mockImplementation(() => ({ play: mockPlay }))
 
-    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }))
+    renderHook(() => useChat({}, { ...ALL_OFF, twitch: true }, ALL_NULL))
     await act(async () => {
       const handler = (window as unknown as Record<string, Function>)._chatHandler
       handler(mockMsg({ platform: 'youtube' }))
     })
     expect(mockPlay).not.toHaveBeenCalled()
+    expect(playDefaultTone).not.toHaveBeenCalled()
   })
 })

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChatMessage, Platform } from '../../shared/types'
-import notifySound from '../assets/notify.mp3'
+import { playDefaultTone } from '../audio/tones'
 
 export interface ChatFilters {
   platforms?: Platform[]
@@ -23,21 +23,26 @@ function matchesFilters(msg: ChatMessage, filters: ChatFilters): boolean {
 
 const MAX_FEED_MESSAGES = 500
 
+const DEFAULT_SOUNDS: Record<Platform, boolean> = {
+  twitch: false, youtube: false, kick: false, tiktok: false, facebook: false
+}
+
+const DEFAULT_PATHS: Record<Platform, string | null> = {
+  twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
+}
+
 export function useChat(
   filters: ChatFilters,
-  notificationSounds: Record<Platform, boolean> = {
-    twitch: false,
-    youtube: false,
-    kick: false,
-    tiktok: false,
-    facebook: false
-  }
+  notificationSounds: Record<Platform, boolean> = DEFAULT_SOUNDS,
+  notificationSoundPaths: Record<Platform, string | null> = DEFAULT_PATHS
 ): { messages: ChatMessage[] } {
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([])
   const filtersRef = useRef(filters)
   filtersRef.current = filters
   const soundsRef = useRef(notificationSounds)
   soundsRef.current = notificationSounds
+  const pathsRef = useRef(notificationSoundPaths)
+  pathsRef.current = notificationSoundPaths
 
   useEffect(() => {
     window.electronAPI.getRecentMessages(MAX_FEED_MESSAGES).then(history => {
@@ -52,7 +57,12 @@ export function useChat(
         return next.length > MAX_FEED_MESSAGES ? next.slice(0, MAX_FEED_MESSAGES) : next
       })
       if (soundsRef.current[msg.platform]) {
-        new Audio(notifySound).play().catch(() => {})
+        const customPath = pathsRef.current[msg.platform]
+        if (customPath) {
+          new Audio(`file://${customPath}`).play().catch(() => {})
+        } else {
+          playDefaultTone(msg.platform)
+        }
       }
     })
     return unsub
