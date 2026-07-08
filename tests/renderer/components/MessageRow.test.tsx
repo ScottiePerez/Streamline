@@ -11,19 +11,36 @@ const msg: ChatMessage = {
 
 describe('MessageRow', () => {
   it('renders the message text', () => {
-    render(<MessageRow message={msg} onModerate={jest.fn()} />)
+    render(<MessageRow message={msg} onModerate={jest.fn()} fontSize="md" />)
     expect(screen.getByText('hello chat')).toBeInTheDocument()
   })
 
   it('renders the display name', () => {
-    render(<MessageRow message={msg} onModerate={jest.fn()} />)
+    render(<MessageRow message={msg} onModerate={jest.fn()} fontSize="md" />)
     expect(screen.getByText('Viewer1')).toBeInTheDocument()
   })
 
   it('shows deleted style when isDeleted=true', () => {
     const deleted = { ...msg, isDeleted: true }
-    render(<MessageRow message={deleted} onModerate={jest.fn()} />)
+    render(<MessageRow message={deleted} onModerate={jest.fn()} fontSize="md" />)
     const row = screen.getByTestId('message-row')
     expect(row.className).toContain('opacity')
+  })
+})
+
+describe('MessageRow — fontSize', () => {
+  it('applies text-sm class when fontSize is sm', () => {
+    render(<MessageRow message={msg} onModerate={jest.fn()} fontSize="sm" />)
+    expect(screen.getByText('hello chat')).toHaveClass('text-sm')
+  })
+
+  it('applies text-base class when fontSize is md', () => {
+    render(<MessageRow message={msg} onModerate={jest.fn()} fontSize="md" />)
+    expect(screen.getByText('hello chat')).toHaveClass('text-base')
+  })
+
+  it('applies text-lg class when fontSize is lg', () => {
+    render(<MessageRow message={msg} onModerate={jest.fn()} fontSize="lg" />)
+    expect(screen.getByText('hello chat')).toHaveClass('text-lg')
   })
 })

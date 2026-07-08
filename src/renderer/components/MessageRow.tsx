@@ -10,13 +10,20 @@ interface ModerateAction {
 interface Props {
   message: ChatMessage
   onModerate: (action: ModerateAction) => void
+  fontSize: 'sm' | 'md' | 'lg'
+}
+
+const FONT_SIZE_CLASS: Record<'sm' | 'md' | 'lg', string> = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg'
 }
 
 function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function MessageRow({ message, onModerate }: Props): React.JSX.Element {
+export default function MessageRow({ message, onModerate, fontSize }: Props): React.JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -35,7 +42,7 @@ export default function MessageRow({ message, onModerate }: Props): React.JSX.El
     >
       <PlatformBadge platform={message.platform} />
       <span className="font-semibold text-indigo-300 shrink-0">{message.displayName}</span>
-      <span className="text-gray-300 break-words min-w-0">{message.text}</span>
+      <span className={`${FONT_SIZE_CLASS[fontSize]} text-gray-300 break-words min-w-0`}>{message.text}</span>
       <span className="ml-auto text-xs text-gray-600 shrink-0 opacity-0 group-hover:opacity-100">
         {formatTime(message.timestamp)}
       </span>

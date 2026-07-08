@@ -6,10 +6,12 @@ import { useChat } from '../hooks/useChat'
 
 interface Props {
   filters: ChatFilters
+  fontSize: 'sm' | 'md' | 'lg'
+  notificationSounds: Record<Platform, boolean>
 }
 
-export default function ChatFeed({ filters }: Props): React.JSX.Element {
-  const { messages } = useChat(filters)
+export default function ChatFeed({ filters, fontSize, notificationSounds }: Props): React.JSX.Element {
+  const { messages } = useChat(filters, notificationSounds)
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -38,7 +40,7 @@ export default function ChatFeed({ filters }: Props): React.JSX.Element {
     <div ref={containerRef} className="flex-1 overflow-y-auto flex flex-col-reverse">
       <div ref={bottomRef} />
       {messages.map(msg => (
-        <MessageRow key={msg.id} message={msg} onModerate={handleModerate} />
+        <MessageRow key={msg.id} message={msg} onModerate={handleModerate} fontSize={fontSize} />
       ))}
     </div>
   )
