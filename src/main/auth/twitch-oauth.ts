@@ -4,7 +4,7 @@ import { shell } from 'electron'
 export const TWITCH_CLIENT_ID = 'REPLACE_WITH_YOUR_CLIENT_ID'
 
 const SCOPES = 'chat:read chat:edit moderator:manage:chat_messages moderator:manage:banned_users'
-const REDIRECT_URI = 'streamline://auth/callback'
+const REDIRECT_URI = 'https://scottieperez.github.io/Streamline/callback'
 const TIMEOUT_MS = 5 * 60 * 1000
 
 let pendingOAuthResolve: ((url: string) => void) | null = null
