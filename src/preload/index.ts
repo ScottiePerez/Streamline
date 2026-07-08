@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import type { ChatMessage, ModerationAction, AppSettings, Platform, ConnectionStatus } from '../shared/types'
 import type { ModerationResult } from '../main/chat-bus'
+import type { TeamClientStatus } from '../main/team-client'
 
 const electronAPI = {
   onMessage(handler: (msg: ChatMessage) => void): () => void {
@@ -70,6 +71,42 @@ const electronAPI = {
 
   unbanUser(platform: Platform, userId: string, actionId: string): Promise<{ success: boolean; error?: string }> {
     return ipcRenderer.invoke('mod:unban', platform, userId, actionId)
+  },
+
+  getTeamInviteCode(): Promise<string> {
+    return ipcRenderer.invoke('team:getInviteCode')
+  },
+
+  getTeamClientCount(): Promise<number> {
+    return ipcRenderer.invoke('team:getClientCount')
+  },
+
+  onTeamClientCount(handler: (count: number) => void): () => void {
+    const listener = (_: Electron.IpcRendererEvent, count: number) => handler(count)
+    ipcRenderer.on('team:clientCount', listener)
+    return () => ipcRenderer.removeListener('team:clientCount', listener)
+  },
+
+  setTeamPassphrase(passphrase: string): Promise<void> {
+    return ipcRenderer.invoke('team:setPassphrase', passphrase)
+  },
+
+  connectToTeam(code: string, passphrase: string): Promise<void> {
+    return ipcRenderer.invoke('team:connect', code, passphrase)
+  },
+
+  disconnectFromTeam(): Promise<void> {
+    return ipcRenderer.invoke('team:disconnect')
+  },
+
+  getTeamStatus(): Promise<TeamClientStatus> {
+    return ipcRenderer.invoke('team:getStatus')
+  },
+
+  onTeamStatus(handler: (status: TeamClientStatus) => void): () => void {
+    const listener = (_: Electron.IpcRendererEvent, status: TeamClientStatus) => handler(status)
+    ipcRenderer.on('team:status', listener)
+    return () => ipcRenderer.removeListener('team:status', listener)
   }
 }
 

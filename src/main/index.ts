@@ -8,8 +8,10 @@ import { KickAdapter } from './adapters/kick'
 import { TikTokAdapter } from './adapters/tiktok'
 import { FacebookAdapter } from './adapters/facebook'
 import { registerIpcHandlers } from './ipc-handlers'
-import { getToken } from './auth/keychain'
+import { getToken, getSecret } from './auth/keychain'
 import { getSettings } from './store/settings'
+import { TeamServer } from './team-server'
+import { TeamClient } from './team-client'
 import type { Platform, Credentials } from '../shared/types'
 
 async function tryConnect(
@@ -32,6 +34,8 @@ async function tryConnect(
 async function main(): Promise<void> {
   const db = openDb(join(app.getPath('userData'), 'streamchat.db'))
   const bus = new ChatBus(db)
+  const teamServer = new TeamServer(bus, db)
+  const teamClient = new TeamClient()
 
   const win = new BrowserWindow({
     width: 1200,
@@ -46,7 +50,7 @@ async function main(): Promise<void> {
     }
   })
 
-  registerIpcHandlers(bus, db, win)
+  registerIpcHandlers(bus, db, win, teamServer, teamClient)
 
   if (process.env['ELECTRON_RENDERER_URL']) {
     win.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -55,6 +59,18 @@ async function main(): Promise<void> {
   }
 
   const settings = getSettings(db)
+
+  if (settings.teamModeEnabled) {
+    const passphrase = await getSecret('team-passphrase')
+    if (passphrase) {
+      teamServer.start(settings.teamModePort, passphrase)
+    }
+  }
+
+  app.on('before-quit', () => {
+    teamServer.stop()
+    teamClient.disconnect()
+  })
 
   const twitchToken = await getToken('twitch')
   if (twitchToken && settings.twitchChannelId) {

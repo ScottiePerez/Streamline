@@ -1,13 +1,23 @@
 import { ipcMain, BrowserWindow } from 'electron'
+import os from 'os'
 import type { ChatBus } from './chat-bus'
 import type { Db } from './store/db'
 import type { Platform, AppSettings, ConnectionStatus } from '../shared/types'
+import type { TeamServer } from './team-server'
+import type { TeamClient, TeamClientStatus } from './team-client'
 import { getRecentMessages } from './store/messages'
 import { getModerationActions, exportModerationCsv } from './store/moderation'
 import { getSettings, setSettings } from './store/settings'
-import { getToken, setToken, deleteToken } from './auth/keychain'
+import { getToken, setToken, deleteToken, getSecret, setSecret } from './auth/keychain'
+import { generateInviteCode, generateSalt } from './invite-code'
 
-export function registerIpcHandlers(bus: ChatBus, db: Db, win: BrowserWindow): void {
+export function registerIpcHandlers(
+  bus: ChatBus,
+  db: Db,
+  win: BrowserWindow,
+  teamServer: TeamServer,
+  teamClient: TeamClient
+): void {
   bus.on('message', msg => win.webContents.send('chat:message', msg))
   bus.on('modResult', result => win.webContents.send('mod:result', result))
   bus.on('status', (platform: Platform, status: ConnectionStatus) =>
@@ -56,4 +66,71 @@ export function registerIpcHandlers(bus: ChatBus, db: Db, win: BrowserWindow): v
   ipcMain.handle('mod:unban', async (_e, platform: Platform, userId: string, actionId: string) =>
     bus.unban(platform, userId, actionId)
   )
+
+  // Team server — host side
+  teamServer.on('clientCountChanged', (count: number) => {
+    win.webContents.send('team:clientCount', count)
+  })
+
+  ipcMain.handle('team:getClientCount', () => teamServer.getClientCount())
+
+  ipcMain.handle('team:getInviteCode', async () => {
+    const passphrase = await getSecret('team-passphrase')
+    let salt = await getSecret('team-salt')
+    if (!salt) {
+      salt = generateSalt()
+      await setSecret('team-salt', salt)
+    }
+    if (!passphrase) return ''
+    const settings = getSettings(db)
+    const ip = getLocalIp()
+    return generateInviteCode(ip, settings.teamModePort, passphrase, salt)
+  })
+
+  ipcMain.handle('team:setPassphrase', async (_e, passphrase: string) => {
+    await setSecret('team-passphrase', passphrase)
+    let salt = await getSecret('team-salt')
+    if (!salt) {
+      salt = generateSalt()
+      await setSecret('team-salt', salt)
+    }
+  })
+
+  // Team client — teammate side
+  ipcMain.handle('team:connect', async (_e, code: string, passphrase: string) => {
+    let salt = await getSecret('team-salt')
+    if (!salt) {
+      salt = generateSalt()
+      await setSecret('team-salt', salt)
+    }
+    await teamClient.connect(code, passphrase, salt)
+  })
+
+  ipcMain.handle('team:disconnect', () => {
+    teamClient.disconnect()
+  })
+
+  ipcMain.handle('team:getStatus', () => teamClient.getStatus())
+
+  teamClient.on('status', (status: TeamClientStatus) => {
+    win.webContents.send('team:status', status)
+  })
+
+  teamClient.on('message', (msg) => {
+    win.webContents.send('chat:message', msg)
+  })
+
+  teamClient.on('modResult', (result) => {
+    win.webContents.send('mod:result', result)
+  })
+}
+
+function getLocalIp(): string {
+  const interfaces = os.networkInterfaces()
+  for (const iface of Object.values(interfaces)) {
+    for (const info of iface ?? []) {
+      if (info.family === 'IPv4' && !info.internal) return info.address
+    }
+  }
+  return '127.0.0.1'
 }
