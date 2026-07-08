@@ -65,6 +65,11 @@ export interface AppSettings {
   teamModeEnabled: boolean
   teamModePort: number
   twitchChannelId?: string
+  youtubeChannelId?: string
+  kickChannelId?: string
+  tiktokChannelId?: string
+  facebookLiveVideoId?: string
+  facebookPageId?: string
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -80,5 +85,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   },
   teamModeEnabled: false,
   teamModePort: 7350,
-  twitchChannelId: ''
+  twitchChannelId: '',
+  youtubeChannelId: '',
+  kickChannelId: '',
+  tiktokChannelId: '',
+  facebookLiveVideoId: '',
+  facebookPageId: ''
 }
