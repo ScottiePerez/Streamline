@@ -107,6 +107,18 @@ const electronAPI = {
     const listener = (_: Electron.IpcRendererEvent, status: TeamClientStatus) => handler(status)
     ipcRenderer.on('team:status', listener)
     return () => ipcRenderer.removeListener('team:status', listener)
+  },
+
+  setCustomSound(platform: Platform, sourcePath: string): Promise<string> {
+    return ipcRenderer.invoke('sounds:setCustom', platform, sourcePath)
+  },
+
+  clearCustomSound(platform: Platform): Promise<void> {
+    return ipcRenderer.invoke('sounds:clearCustom', platform)
+  },
+
+  pickSoundFile(): Promise<string | null> {
+    return ipcRenderer.invoke('sounds:pick')
   }
 }
 

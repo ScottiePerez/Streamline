@@ -28,7 +28,10 @@ beforeEach(() => {
     connectToTeam: jest.fn().mockResolvedValue(undefined),
     disconnectFromTeam: jest.fn().mockResolvedValue(undefined),
     getTeamStatus: jest.fn().mockResolvedValue('disconnected'),
-    onTeamStatus: jest.fn(() => jest.fn())
+    onTeamStatus: jest.fn(() => jest.fn()),
+    setCustomSound: jest.fn().mockResolvedValue('/userData/sounds/twitch.mp3'),
+    clearCustomSound: jest.fn().mockResolvedValue(undefined),
+    pickSoundFile: jest.fn().mockResolvedValue(null)
   } as unknown as typeof window.electronAPI
   mockSendMessage.mockClear()
 })

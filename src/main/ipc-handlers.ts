@@ -1,5 +1,7 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain, BrowserWindow, dialog, app } from 'electron'
 import os from 'os'
+import fs from 'fs/promises'
+import path from 'path'
 import type { ChatBus } from './chat-bus'
 import type { Db } from './store/db'
 import type { Platform, AppSettings, ConnectionStatus } from '../shared/types'
@@ -122,6 +124,34 @@ export function registerIpcHandlers(
 
   teamClient.on('modResult', (result) => {
     win.webContents.send('mod:result', result)
+  })
+
+  ipcMain.handle('sounds:pick', async () => {
+    const result = await dialog.showOpenDialog(win, {
+      title: 'Choose alert sound',
+      filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }],
+      properties: ['openFile']
+    })
+    return result.canceled ? null : result.filePaths[0]
+  })
+
+  ipcMain.handle('sounds:setCustom', async (_e, platform: Platform, sourcePath: string) => {
+    const soundsDir = path.join(app.getPath('userData'), 'sounds')
+    await fs.mkdir(soundsDir, { recursive: true })
+    for (const ext of ['.mp3', '.wav', '.ogg']) {
+      await fs.unlink(path.join(soundsDir, `${platform}${ext}`)).catch(() => {})
+    }
+    const destExt = path.extname(sourcePath)
+    const dest = path.join(soundsDir, `${platform}${destExt}`)
+    await fs.copyFile(sourcePath, dest)
+    return dest
+  })
+
+  ipcMain.handle('sounds:clearCustom', async (_e, platform: Platform) => {
+    const soundsDir = path.join(app.getPath('userData'), 'sounds')
+    for (const ext of ['.mp3', '.wav', '.ogg']) {
+      await fs.unlink(path.join(soundsDir, `${platform}${ext}`)).catch(() => {})
+    }
   })
 }
 

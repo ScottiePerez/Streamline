@@ -8,6 +8,7 @@ const DEFAULT: AppSettings = {
   fontSize: 'md',
   maxMessagesPerPlatform: 10000,
   notificationSounds: { twitch: false, youtube: false, kick: false, tiktok: false, facebook: false },
+  notificationSoundPaths: { twitch: null, youtube: null, kick: null, tiktok: null, facebook: null },
   teamModeEnabled: false,
   teamModePort: 7350
 }
@@ -36,7 +37,10 @@ beforeEach(() => {
     connectToTeam: jest.fn().mockResolvedValue(undefined),
     disconnectFromTeam: jest.fn().mockResolvedValue(undefined),
     getTeamStatus: jest.fn().mockResolvedValue('disconnected'),
-    onTeamStatus: jest.fn(() => jest.fn())
+    onTeamStatus: jest.fn(() => jest.fn()),
+    setCustomSound: jest.fn().mockResolvedValue('/userData/sounds/twitch.mp3'),
+    clearCustomSound: jest.fn().mockResolvedValue(undefined),
+    pickSoundFile: jest.fn().mockResolvedValue(null)
   } as unknown as typeof window.electronAPI
 })
 
