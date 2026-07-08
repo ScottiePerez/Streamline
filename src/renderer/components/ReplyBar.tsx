@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import type { Platform } from '../../shared/types'
 
 
+const ALL_PLATFORMS: Platform[] = ['twitch', 'youtube', 'kick', 'tiktok']
+
 const PLATFORM_STYLES: Record<Platform, { active: string; label: string }> = {
   twitch: { active: 'bg-purple-500 text-white', label: 'T' },
   youtube: { active: 'bg-red-500 text-white', label: 'Y' },
