@@ -20,10 +20,13 @@ export class MockWebcastPushConnection {
 
 let lastInstance: MockWebcastPushConnection | null = null
 
-export const WebcastPushConnection = jest.fn().mockImplementation(() => {
+export const TikTokLiveConnection = jest.fn().mockImplementation(() => {
   lastInstance = new MockWebcastPushConnection()
   return lastInstance
 })
+
+// Alias kept for backwards-compatible test imports
+export const WebcastPushConnection = TikTokLiveConnection
 
 export function _getLastInstance(): MockWebcastPushConnection | null {
   return lastInstance
