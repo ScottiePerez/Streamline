@@ -65,6 +65,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
   const [teamStatus, setTeamStatus] = useState<TeamClientStatus>('disconnected')
   const [copied, setCopied] = useState(false)
   const [soundPaths, setSoundPaths] = useState<Record<Platform, string | null>>({
+    twitch: null, youtube: null, kick: null, tiktok: null
   })
   const [soundErrors, setSoundErrors] = useState<Partial<Record<Platform, string>>>({})
 
