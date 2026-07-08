@@ -1,6 +1,5 @@
-.DS_Store
-.claude/
 node_modules/
 dist/
-out/
+dist-electron/
+.DS_Store
 *.log
