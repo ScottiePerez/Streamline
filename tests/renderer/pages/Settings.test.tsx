@@ -28,7 +28,15 @@ beforeEach(() => {
     getRecentMessages: jest.fn().mockResolvedValue([]),
     getModerationActions: jest.fn(),
     exportModerationCsv: jest.fn(),
-    unbanUser: jest.fn()
+    unbanUser: jest.fn(),
+    getTeamInviteCode: jest.fn().mockResolvedValue('ABCD-EFGH-IJKL'),
+    getTeamClientCount: jest.fn().mockResolvedValue(0),
+    onTeamClientCount: jest.fn(() => jest.fn()),
+    setTeamPassphrase: jest.fn().mockResolvedValue(undefined),
+    connectToTeam: jest.fn().mockResolvedValue(undefined),
+    disconnectFromTeam: jest.fn().mockResolvedValue(undefined),
+    getTeamStatus: jest.fn().mockResolvedValue('disconnected'),
+    onTeamStatus: jest.fn(() => jest.fn())
   } as unknown as typeof window.electronAPI
 })
 
@@ -109,6 +117,56 @@ describe('Settings — Notification Sounds', () => {
     expect(window.electronAPI.setSettings).toHaveBeenCalledWith({
       notificationSounds: { twitch: true, youtube: false, kick: false, tiktok: false, facebook: false }
     })
+  })
+})
+
+describe('Settings — team mode host', () => {
+  it('shows passphrase field when team mode enabled', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      ...DEFAULT, teamModeEnabled: true
+    })
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByPlaceholderText('Choose a passphrase')).toBeInTheDocument()
+  })
+
+  it('shows invite code when team mode enabled', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      ...DEFAULT, teamModeEnabled: true
+    })
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByText('ABCD-EFGH-IJKL')).toBeInTheDocument()
+  })
+
+  it('shows connected teammates count', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      ...DEFAULT, teamModeEnabled: true
+    })
+    ;(window.electronAPI.getTeamClientCount as jest.Mock).mockResolvedValue(2)
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByText(/2 connected/i)).toBeInTheDocument()
+  })
+})
+
+describe('Settings — join team', () => {
+  it('shows join team section always', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByText('Join Team')).toBeInTheDocument()
+  })
+
+  it('connect button calls connectToTeam with code and passphrase', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    await screen.findByText('Join Team')
+    fireEvent.change(screen.getByPlaceholderText('Paste invite code'), { target: { value: 'ABCD-EFGH' } })
+    fireEvent.change(screen.getByPlaceholderText('Passphrase'), { target: { value: 'mypass' } })
+    fireEvent.click(screen.getByRole('button', { name: /connect/i }))
+    await waitFor(() =>
+      expect(window.electronAPI.connectToTeam).toHaveBeenCalledWith('ABCD-EFGH', 'mypass')
+    )
+  })
+
+  it('shows disconnected status initially', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByText(/disconnected/i)).toBeInTheDocument()
   })
 })
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import type { AppSettings, Platform } from '../../shared/types'
+import type { TeamClientStatus } from '../../main/team-client'
 
 interface Props {
   onSettingsChange: (partial: Partial<AppSettings>) => void
@@ -52,10 +53,27 @@ function Toggle({ checked, onChange, id, ariaLabelledBy }: ToggleProps): React.J
 
 export default function Settings({ onSettingsChange }: Props): React.JSX.Element {
   const [settings, setSettings] = useState<AppSettings | null>(null)
+  const [passphrase, setPassphrase] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
+  const [clientCount, setClientCount] = useState(0)
+  const [joinCode, setJoinCode] = useState('')
+  const [joinPassphrase, setJoinPassphrase] = useState('')
+  const [teamStatus, setTeamStatus] = useState<TeamClientStatus>('disconnected')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     window.electronAPI.getSettings().then(s => setSettings(s))
+    window.electronAPI.getTeamStatus().then(setTeamStatus)
+    window.electronAPI.getTeamClientCount().then(setClientCount)
+    const unsubStatus = window.electronAPI.onTeamStatus(setTeamStatus)
+    const unsubCount = window.electronAPI.onTeamClientCount(setClientCount)
+    return () => { unsubStatus(); unsubCount() }
   }, [])
+
+  useEffect(() => {
+    if (!settings?.teamModeEnabled) return
+    window.electronAPI.getTeamInviteCode().then(setInviteCode)
+  }, [settings?.teamModeEnabled, settings?.teamModePort, passphrase])
 
   function save(partial: Partial<AppSettings>): void {
     window.electronAPI.setSettings(partial)
@@ -166,7 +184,7 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
           </div>
         </section>
 
-        {/* Team Mode */}
+        {/* Team Mode — Host */}
         <section>
           <SectionHeading>Team Mode</SectionHeading>
           <div className="bg-white rounded-lg px-4 py-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col gap-4">
@@ -200,9 +218,100 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
                 className="w-24 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
               />
             </div>
-            <p className="text-xs text-gray-500">
-              Team mode is saved for a future release. Enabling it now has no effect.
-            </p>
+            {settings.teamModeEnabled && (
+              <>
+                <div className="flex items-center justify-between gap-4">
+                  <label className="text-sm text-gray-700 dark:text-gray-200">Passphrase</label>
+                  <input
+                    type="password"
+                    placeholder="Choose a passphrase"
+                    value={passphrase}
+                    onChange={e => setPassphrase(e.target.value)}
+                    onBlur={async () => {
+                      if (passphrase) await window.electronAPI.setTeamPassphrase(passphrase)
+                    }}
+                    className="w-48 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-gray-700 dark:text-gray-200">Invite code</span>
+                  <div className="flex items-center gap-2 flex-1 justify-end">
+                    <span className="text-sm font-mono text-gray-600 dark:text-gray-400 truncate max-w-xs">{inviteCode || '—'}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(inviteCode)
+                        setCopied(true)
+                        setTimeout(() => setCopied(false), 2000)
+                      }}
+                      disabled={!inviteCode}
+                      className="px-2 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-500 disabled:opacity-40"
+                    >
+                      {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Connected teammates</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-200">{clientCount} connected</span>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* Join Team — Teammate */}
+        <section>
+          <SectionHeading>Join Team</SectionHeading>
+          <div className="bg-white rounded-lg px-4 py-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4">
+              <label className="text-sm text-gray-700 dark:text-gray-200 shrink-0">Invite code</label>
+              <input
+                type="text"
+                placeholder="Paste invite code"
+                value={joinCode}
+                onChange={e => setJoinCode(e.target.value)}
+                className="flex-1 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <label className="text-sm text-gray-700 dark:text-gray-200 shrink-0">Passphrase</label>
+              <input
+                type="password"
+                placeholder="Passphrase"
+                value={joinPassphrase}
+                onChange={e => setJoinPassphrase(e.target.value)}
+                className="flex-1 bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              {teamStatus === 'connected' ? (
+                <button
+                  onClick={() => window.electronAPI.disconnectFromTeam()}
+                  className="px-4 py-1.5 text-sm bg-red-600 hover:bg-red-500 text-white rounded"
+                >
+                  Disconnect
+                </button>
+              ) : (
+                <button
+                  onClick={() => window.electronAPI.connectToTeam(joinCode, joinPassphrase)}
+                  disabled={!joinCode || !joinPassphrase || teamStatus === 'connecting'}
+                  className="px-4 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded disabled:opacity-40"
+                >
+                  {teamStatus === 'connecting' ? 'Connecting…' : 'Connect'}
+                </button>
+              )}
+              <span className={`text-sm ${
+                teamStatus === 'connected' ? 'text-green-500' :
+                teamStatus === 'error' ? 'text-red-500' :
+                teamStatus === 'connecting' ? 'text-yellow-500' :
+                'text-gray-400 dark:text-gray-500'
+              }`}>
+                {teamStatus === 'connected' ? '● Connected' :
+                 teamStatus === 'connecting' ? '● Connecting…' :
+                 teamStatus === 'error' ? '● Error' :
+                 '○ Disconnected'}
+              </span>
+            </div>
           </div>
         </section>
 

@@ -20,7 +20,15 @@ beforeEach(() => {
     deleteToken: jest.fn(),
     getModerationActions: jest.fn(),
     exportModerationCsv: jest.fn(),
-    unbanUser: jest.fn()
+    unbanUser: jest.fn(),
+    getTeamInviteCode: jest.fn().mockResolvedValue('ABCD-EFGH-IJKL'),
+    getTeamClientCount: jest.fn().mockResolvedValue(0),
+    onTeamClientCount: jest.fn(() => jest.fn()),
+    setTeamPassphrase: jest.fn().mockResolvedValue(undefined),
+    connectToTeam: jest.fn().mockResolvedValue(undefined),
+    disconnectFromTeam: jest.fn().mockResolvedValue(undefined),
+    getTeamStatus: jest.fn().mockResolvedValue('disconnected'),
+    onTeamStatus: jest.fn(() => jest.fn())
   } as unknown as typeof window.electronAPI
   mockSendMessage.mockClear()
 })
