@@ -110,3 +110,68 @@ describe('AccountManager — channel ID inputs', () => {
     )
   })
 })
+
+describe('AccountManager — Twitch OAuth', () => {
+  beforeEach(() => {
+    ;(window.electronAPI.startTwitchOAuth as jest.Mock).mockResolvedValue('StreamerDude')
+  })
+
+  it('Twitch Connect button calls startTwitchOAuth, not window.prompt', async () => {
+    const promptSpy = jest.spyOn(window, 'prompt')
+    render(<AccountManager />)
+    await waitFor(() => screen.getAllByRole('button', { name: /connect/i }))
+    const connectButtons = screen.getAllByRole('button', { name: /connect/i })
+    fireEvent.click(connectButtons[0])
+    await waitFor(() =>
+      expect(window.electronAPI.startTwitchOAuth).toHaveBeenCalled()
+    )
+    expect(promptSpy).not.toHaveBeenCalled()
+    promptSpy.mockRestore()
+  })
+
+  it('shows "Connected as StreamerDude" after successful OAuth', async () => {
+    render(<AccountManager />)
+    await waitFor(() => screen.getAllByRole('button', { name: /connect/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /connect/i })[0])
+    expect(await screen.findByText('Connected as StreamerDude')).toBeInTheDocument()
+  })
+
+  it('shows error message inline when OAuth fails', async () => {
+    ;(window.electronAPI.startTwitchOAuth as jest.Mock).mockRejectedValueOnce(
+      new Error('Authorization cancelled')
+    )
+    render(<AccountManager />)
+    await waitFor(() => screen.getAllByRole('button', { name: /connect/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /connect/i })[0])
+    expect(await screen.findByText('Authorization cancelled')).toBeInTheDocument()
+  })
+
+  it('loads twitchUsername from settings on mount', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      twitchUsername: 'ExistingStreamer'
+    })
+    ;(window.electronAPI.getToken as jest.Mock).mockImplementation(
+      async (platform: string) => platform === 'twitch' ? 'oauth:stored-token' : null
+    )
+    render(<AccountManager />)
+    expect(await screen.findByText('Connected as ExistingStreamer')).toBeInTheDocument()
+  })
+
+  it('clears username on Disconnect', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      twitchUsername: 'ExistingStreamer'
+    })
+    ;(window.electronAPI.getToken as jest.Mock).mockImplementation(
+      async (platform: string) => platform === 'twitch' ? 'oauth:stored-token' : null
+    )
+    render(<AccountManager />)
+    await screen.findByText('Connected as ExistingStreamer')
+    fireEvent.click(screen.getByRole('button', { name: /disconnect/i }))
+    await waitFor(() =>
+      expect(screen.queryByText('Connected as ExistingStreamer')).not.toBeInTheDocument()
+    )
+    expect(window.electronAPI.setSettings).toHaveBeenCalledWith(
+      expect.objectContaining({ twitchUsername: '' })
+    )
+  })
+})

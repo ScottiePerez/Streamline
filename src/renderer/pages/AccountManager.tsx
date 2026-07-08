@@ -57,11 +57,14 @@ export default function AccountManager(): React.JSX.Element {
   const [tokens, setTokens] = useState<Partial<Record<Platform, string | null>>>({})
   const [statuses, setStatuses] = useState<Partial<Record<Platform, ConnectionStatus>>>({})
   const [channelIds, setChannelIds] = useState<Partial<AppSettings>>({})
+  const [twitchUsername, setTwitchUsername] = useState<string>('')
+  const [twitchError, setTwitchError] = useState<string>('')
 
   useEffect(() => {
     void (async () => {
       const settings = await window.electronAPI.getSettings()
       setChannelIds(settings)
+      if (settings.twitchUsername) setTwitchUsername(settings.twitchUsername)
       await Promise.all(
         PLATFORMS.map(async ({ id }) => {
           const token = await window.electronAPI.getToken(id)
@@ -77,6 +80,17 @@ export default function AccountManager(): React.JSX.Element {
   }, [])
 
   async function handleConnect(platform: Platform): Promise<void> {
+    if (platform === 'twitch') {
+      setTwitchError('')
+      try {
+        const username = await window.electronAPI.startTwitchOAuth()
+        setTokens(prev => ({ ...prev, twitch: 'connected' }))
+        setTwitchUsername(username)
+      } catch (e) {
+        setTwitchError((e as Error).message)
+      }
+      return
+    }
     const token = window.prompt(`Paste your ${platform} OAuth token:`)
     if (!token) return
     await window.electronAPI.setToken(platform, token)
@@ -87,6 +101,10 @@ export default function AccountManager(): React.JSX.Element {
     await window.electronAPI.deleteToken(platform)
     setTokens(prev => ({ ...prev, [platform]: null }))
     setStatuses(prev => ({ ...prev, [platform]: 'disconnected' }))
+    if (platform === 'twitch') {
+      setTwitchUsername('')
+      void window.electronAPI.setSettings({ twitchUsername: '' })
+    }
   }
 
   function handleChannelIdBlur(key: keyof AppSettings, value: string): void {
@@ -116,6 +134,12 @@ export default function AccountManager(): React.JSX.Element {
                   <div className={`text-xs ${STATUS_COLORS[status]}`}>
                     {status}{note ? ` · ${note}` : ''}
                   </div>
+                  {id === 'twitch' && twitchUsername && (
+                    <div className="text-xs text-gray-400 mt-0.5">Connected as {twitchUsername}</div>
+                  )}
+                  {id === 'twitch' && twitchError && (
+                    <p className="text-xs text-red-400 mt-0.5">{twitchError}</p>
+                  )}
                 </div>
                 {hasToken ? (
                   <button
