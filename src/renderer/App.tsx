@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import AccountManager from './pages/AccountManager'
+import ChatFeed from './components/ChatFeed'
 
 type View = 'chat' | 'accounts'
 
@@ -12,8 +13,8 @@ export default function App(): React.JSX.Element {
       <Sidebar activeView={view} onViewChange={setView} />
       <main className="flex-1 flex flex-col overflow-hidden">
         {view === 'chat' && (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            Chat feed loads here (Task 10)
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <ChatFeed filters={{}} />
           </div>
         )}
         {view === 'accounts' && <AccountManager />}

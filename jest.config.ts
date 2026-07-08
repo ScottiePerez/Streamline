@@ -15,7 +15,7 @@ const config: Config = {
     {
       displayName: 'renderer',
       testEnvironment: 'jsdom',
-      testMatch: ['<rootDir>/tests/renderer/**/*.test.tsx'],
+      testMatch: ['<rootDir>/tests/renderer/**/*.test.tsx', '<rootDir>/tests/renderer/**/*.test.ts'],
       transform: { '^.+\\.tsx?$': ['ts-jest', { tsconfig: 'tsconfig.web.json' }] },
       setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
       moduleNameMapper: {
