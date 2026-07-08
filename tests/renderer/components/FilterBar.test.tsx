@@ -31,7 +31,19 @@ describe('FilterBar', () => {
 
   it('calls onChange with keyword when typing in search', async () => {
     const onChange = jest.fn()
-    render(<FilterBar filters={{}} onChange={onChange} />)
+    const TestComponent = () => {
+      const [filters, setFilters] = React.useState({})
+      return (
+        <FilterBar
+          filters={filters}
+          onChange={(newFilters) => {
+            onChange(newFilters)
+            setFilters(newFilters)
+          }}
+        />
+      )
+    }
+    render(<TestComponent />)
     const input = screen.getByPlaceholderText(/search/i)
     await userEvent.type(input, 'hello')
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ keyword: 'hello' }))

@@ -17,18 +17,12 @@ interface Props {
 
 export default function FilterBar({ filters, onChange }: Props): React.JSX.Element {
   const activePlatforms = filters.platforms ?? []
-  const [keyword, setKeyword] = React.useState(filters.keyword ?? '')
 
   function togglePlatform(platform: Platform): void {
     const next = activePlatforms.includes(platform)
       ? activePlatforms.filter(p => p !== platform)
       : [...activePlatforms, platform]
     onChange({ ...filters, platforms: next })
-  }
-
-  function handleKeyword(e: React.ChangeEvent<HTMLInputElement>): void {
-    setKeyword(e.target.value)
-    onChange({ ...filters, keyword: e.target.value })
   }
 
   return (
@@ -50,8 +44,8 @@ export default function FilterBar({ filters, onChange }: Props): React.JSX.Eleme
       <input
         type="text"
         placeholder="Search messages…"
-        value={keyword}
-        onChange={handleKeyword}
+        value={filters.keyword ?? ''}
+        onChange={e => onChange({ ...filters, keyword: e.target.value })}
         className="ml-auto bg-gray-800 text-gray-200 placeholder-gray-500 text-sm px-3 py-1 rounded border border-gray-700 focus:outline-none focus:border-indigo-500 w-48"
       />
     </div>
