@@ -9,7 +9,8 @@
     "preview": "electron-vite preview",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "package": "electron-vite build && electron-builder --mac"
+    "package": "electron-vite build && electron-builder --mac",
+    "package:win": "electron-vite build && electron-builder --win"
   },
   "keywords": [],
   "author": "Scottie Perez",
