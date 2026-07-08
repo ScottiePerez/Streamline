@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar'
 import AccountManager from './pages/AccountManager'
 import ChatFeed from './components/ChatFeed'
 import FilterBar from './components/FilterBar'
+import ReplyBar from './components/ReplyBar'
 import type { ChatFilters } from './hooks/useChat'
 
 type View = 'chat' | 'accounts'
@@ -19,6 +20,7 @@ export default function App(): React.JSX.Element {
           <>
             <FilterBar filters={filters} onChange={setFilters} />
             <ChatFeed filters={filters} />
+            <ReplyBar channelId="your-channel" />
           </>
         )}
         {view === 'accounts' && <AccountManager />}
