@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Sidebar from './components/Sidebar'
 import AccountManager from './pages/AccountManager'
 import Settings from './pages/Settings'
+import ModLog from './pages/ModLog'
 import ChatFeed from './components/ChatFeed'
 import FilterBar from './components/FilterBar'
 import ReplyBar from './components/ReplyBar'
 import type { ChatFilters } from './hooks/useChat'
 import type { AppSettings, Platform } from '../shared/types'
 
-type View = 'chat' | 'accounts' | 'settings'
+type View = 'chat' | 'accounts' | 'settings' | 'modlog'
 
 export default function App(): React.JSX.Element {
   const [view, setView] = useState<View>('chat')
@@ -60,6 +61,7 @@ export default function App(): React.JSX.Element {
         )}
         {view === 'accounts' && <AccountManager />}
         {view === 'settings' && <Settings onSettingsChange={handleSettingsChange} />}
+        {view === 'modlog' && <ModLog />}
       </main>
     </div>
   )
