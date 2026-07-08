@@ -130,6 +130,10 @@ export class KickAdapter extends EventEmitter implements PlatformAdapter {
     if (!res.ok) throw new Error(`Kick ban failed: ${res.status}`)
   }
 
+  async unbanUser(userId: string): Promise<void> {
+    console.warn(`[kick] unbanUser called for ${userId} — Kick unban not yet implemented`)
+  }
+
   getStatus(): ConnectionStatus {
     return this.status
   }

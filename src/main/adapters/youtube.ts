@@ -104,6 +104,10 @@ export class YouTubeAdapter extends EventEmitter implements PlatformAdapter {
     })
   }
 
+  async unbanUser(userId: string): Promise<void> {
+    console.warn(`[youtube] unbanUser called for ${userId} — YouTube Live Chat unban not yet implemented`)
+  }
+
   getStatus(): ConnectionStatus {
     return this.status
   }

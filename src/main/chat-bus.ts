@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 import type { PlatformAdapter, ChatMessage, Platform, ConnectionStatus } from '../shared/types'
 import type { Db } from './store/db'
 import { insertMessage, pruneMessages } from './store/messages'
-import { insertModerationAction } from './store/moderation'
+import { insertModerationAction, deleteModerationAction } from './store/moderation'
 import { getSettings } from './store/settings'
 import { randomUUID } from 'crypto'
 
@@ -90,6 +90,24 @@ export class ChatBus extends EventEmitter {
       const result: ModerationResult = { success: false, platform, actionType, targetUserId, error }
       this.emit('modResult', result)
       return result
+    }
+  }
+
+  async unban(
+    platform: Platform,
+    userId: string,
+    actionId: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const adapter = this.adapters.get(platform)
+    if (!adapter) {
+      return { success: false, error: `No adapter for ${platform}` }
+    }
+    try {
+      await adapter.unbanUser(userId)
+      deleteModerationAction(this.db, actionId)
+      return { success: true }
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : String(err) }
     }
   }
 }

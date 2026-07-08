@@ -83,6 +83,11 @@ export class TwitchAdapter extends EventEmitter implements PlatformAdapter {
     await this.client.ban(this.credentials.channelId, userId)
   }
 
+  async unbanUser(userId: string): Promise<void> {
+    if (!this.client || !this.credentials) throw new Error('Twitch client not connected')
+    await this.client.unban(this.credentials.channelId, userId)
+  }
+
   getStatus(): ConnectionStatus {
     return this.status
   }

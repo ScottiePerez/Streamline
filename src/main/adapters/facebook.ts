@@ -89,6 +89,10 @@ export class FacebookAdapter extends EventEmitter implements PlatformAdapter {
     if (!res.ok) throw new Error(`Facebook ban failed: ${res.status}`)
   }
 
+  async unbanUser(userId: string): Promise<void> {
+    console.warn(`[facebook] unbanUser called for ${userId} — Facebook unban not yet implemented`)
+  }
+
   getStatus(): ConnectionStatus {
     return this.status
   }

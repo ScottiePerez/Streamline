@@ -93,6 +93,10 @@ export class TikTokAdapter extends EventEmitter implements PlatformAdapter {
     throw new Error('TikTok: ban is not supported via unofficial API')
   }
 
+  async unbanUser(_userId: string): Promise<void> {
+    throw new Error('TikTok: unban is not supported via unofficial API')
+  }
+
   getStatus(): ConnectionStatus {
     return this.status
   }

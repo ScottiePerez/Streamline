@@ -29,7 +29,8 @@ beforeEach(() => {
     setToken: jest.fn(),
     deleteToken: jest.fn(),
     getModerationActions: jest.fn(),
-    exportModerationCsv: jest.fn()
+    exportModerationCsv: jest.fn(),
+    unbanUser: jest.fn()
   } as unknown as typeof window.electronAPI
 })
 

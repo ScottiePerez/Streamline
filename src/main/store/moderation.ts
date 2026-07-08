@@ -68,6 +68,10 @@ function csvCell(value: string | number): string {
   return s
 }
 
+export function deleteModerationAction(db: Db, id: string): void {
+  db.prepare('DELETE FROM moderation_actions WHERE id = ?').run(id)
+}
+
 export function exportModerationCsv(db: Db): string {
   const actions = getModerationActions(db)
   const header = 'id,platform,type,targetUsername,moderatorName,reason,duration,timestamp'

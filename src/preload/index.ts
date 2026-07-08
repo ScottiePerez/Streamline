@@ -66,6 +66,10 @@ const electronAPI = {
 
   exportModerationCsv(): Promise<string> {
     return ipcRenderer.invoke('mod:exportCsv')
+  },
+
+  unbanUser(platform: Platform, userId: string, actionId: string): Promise<{ success: boolean; error?: string }> {
+    return ipcRenderer.invoke('mod:unban', platform, userId, actionId)
   }
 }
 

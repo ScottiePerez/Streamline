@@ -50,6 +50,7 @@ export interface PlatformAdapter {
   deleteMessage(messageId: string): Promise<void>
   timeoutUser(userId: string, durationSeconds: number): Promise<void>
   banUser(userId: string): Promise<void>
+  unbanUser(userId: string): Promise<void>
   getStatus(): ConnectionStatus
   on(event: 'message', handler: (msg: ChatMessage) => void): void
   on(event: 'error', handler: (err: Error) => void): void

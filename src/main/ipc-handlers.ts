@@ -52,4 +52,8 @@ export function registerIpcHandlers(bus: ChatBus, db: Db, win: BrowserWindow): v
   )
 
   ipcMain.handle('mod:exportCsv', () => exportModerationCsv(db))
+
+  ipcMain.handle('mod:unban', async (_e, platform: Platform, userId: string, actionId: string) =>
+    bus.unban(platform, userId, actionId)
+  )
 }
