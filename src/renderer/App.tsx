@@ -44,7 +44,7 @@ export default function App(): React.JSX.Element {
   }
 
   return (
-    <div className="flex h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-900 text-gray-100 overflow-hidden">
       <Sidebar activeView={view} onViewChange={setView} />
       <main className="flex-1 flex flex-col overflow-hidden">
         {view === 'chat' && (
@@ -59,8 +59,8 @@ export default function App(): React.JSX.Element {
             {channelId ? (
               <ReplyBar channelId={channelId} />
             ) : (
-              <div className="p-2 text-center text-xs text-gray-500">
-                No Twitch channel configured — add your channel in Account settings to enable replies.
+              <div className="px-4 py-3 text-center text-xs text-gray-600 border-t border-white/5 bg-gray-950">
+                No Twitch channel — configure one in Accounts to enable replies.
               </div>
             )}
           </>

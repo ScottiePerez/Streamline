@@ -1,4 +1,3 @@
-import { TikTokLiveConnection } from 'tiktok-live-connector'
 import { EventEmitter } from 'events'
 import { randomUUID } from 'crypto'
 import type {
@@ -32,8 +31,10 @@ export class TikTokAdapter extends EventEmitter implements PlatformAdapter {
     this.credentials = credentials
     this.setStatus('connecting')
 
+    // tiktok-live-connector is ESM-only; must use dynamic import in CJS context
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.connection = new (TikTokLiveConnection as any)(credentials.channelId) as TikTokConnection
+    const { WebcastPushConnection } = await import('tiktok-live-connector') as any
+    this.connection = new WebcastPushConnection(credentials.channelId) as TikTokConnection
 
     this.connection.on('chat', (...args: unknown[]) => {
       const data = args[0] as TikTokChatData

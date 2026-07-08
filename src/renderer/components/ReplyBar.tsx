@@ -3,12 +3,12 @@ import type { Platform } from '../../shared/types'
 
 const ALL_PLATFORMS: Platform[] = ['twitch', 'youtube', 'kick', 'tiktok', 'facebook']
 
-const PLATFORM_COLORS: Record<Platform, string> = {
-  twitch: 'bg-purple-600',
-  youtube: 'bg-red-600',
-  kick: 'bg-green-500',
-  tiktok: 'bg-gray-600',
-  facebook: 'bg-blue-600'
+const PLATFORM_STYLES: Record<Platform, { active: string; label: string }> = {
+  twitch: { active: 'bg-purple-500 text-white', label: 'T' },
+  youtube: { active: 'bg-red-500 text-white', label: 'Y' },
+  kick: { active: 'bg-green-500 text-white', label: 'K' },
+  tiktok: { active: 'bg-gray-500 text-white', label: 'Tk' },
+  facebook: { active: 'bg-blue-500 text-white', label: 'F' }
 }
 
 interface Props {
@@ -36,36 +36,52 @@ export default function ReplyBar({ channelId }: Props): React.JSX.Element {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 px-3 py-2 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex gap-1">
-        {ALL_PLATFORMS.map(p => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => togglePlatform(p)}
-            title={p}
-            className={`w-6 h-6 rounded text-[10px] font-bold text-white transition-opacity ${PLATFORM_COLORS[p]} ${
-              selectedPlatforms.includes(p) ? 'opacity-100' : 'opacity-25'
-            }`}
-          >
-            {p[0].toUpperCase()}
-          </button>
-        ))}
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-2 px-3 py-2.5 border-t border-white/5 bg-gray-950 shrink-0"
+    >
+      {/* Platform toggles */}
+      <div className="flex gap-1 shrink-0">
+        {ALL_PLATFORMS.map(p => {
+          const { active, label } = PLATFORM_STYLES[p]
+          const on = selectedPlatforms.includes(p)
+          return (
+            <button
+              key={p}
+              type="button"
+              onClick={() => togglePlatform(p)}
+              title={p}
+              className={`w-6 h-6 rounded-md text-[9px] font-bold transition-all duration-150 ${
+                on ? active : 'bg-white/5 text-gray-600 hover:text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
-      <input
-        type="text"
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="Send a message…"
-        className="flex-1 bg-white text-gray-800 placeholder-gray-400 text-sm px-3 py-1.5 rounded border border-gray-300 focus:outline-none focus:border-indigo-500 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 dark:border-gray-700"
-      />
+
+      {/* Input */}
+      <div className="flex-1 flex items-center gap-2 bg-white/5 border border-white/8 rounded-xl px-3 py-2 focus-within:border-indigo-500/50 transition-colors">
+        <input
+          type="text"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Send a message…"
+          className="flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-600 focus:outline-none"
+        />
+      </div>
+
+      {/* Send */}
       <button
         type="submit"
         aria-label="Send"
-        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded disabled:opacity-40"
-        disabled={!text.trim()}
+        disabled={!text.trim() || selectedPlatforms.length === 0}
+        className="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
       >
-        Send
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
       </button>
     </form>
   )

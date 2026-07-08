@@ -37,7 +37,7 @@ export default function ChatFeed({ filters, fontSize, notificationSounds, notifi
   }
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto flex flex-col-reverse">
+    <div ref={containerRef} className="flex-1 overflow-y-auto flex flex-col-reverse bg-gray-900">
       <div ref={bottomRef} />
       {messages.map(msg => (
         <MessageRow key={msg.id} message={msg} onModerate={handleModerate} fontSize={fontSize} />

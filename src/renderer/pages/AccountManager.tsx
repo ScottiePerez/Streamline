@@ -113,9 +113,9 @@ export default function AccountManager(): React.JSX.Element {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-6">
-      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Connected Accounts</h1>
-      <div className="flex flex-col gap-4 max-w-xl">
+    <div className="flex-1 overflow-y-auto p-6 bg-gray-900">
+      <h1 className="text-base font-semibold text-gray-100 mb-4 tracking-tight">Connected Accounts</h1>
+      <div className="flex flex-col gap-2 max-w-lg">
         {PLATFORMS.map(({ id, label, color, note, channelFields }) => {
           const hasToken = !!tokens[id]
           const status: ConnectionStatus = statuses[id] ?? (hasToken ? 'connecting' : 'disconnected')
@@ -123,19 +123,19 @@ export default function AccountManager(): React.JSX.Element {
           return (
             <div
               key={id}
-              className="bg-white rounded-lg px-4 py-3 border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+              className="bg-gray-800/60 rounded-xl border border-white/8 px-4 py-3"
             >
-              <div className="flex items-center gap-4">
-                <span className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold text-white ${color}`}>
+              <div className="flex items-center gap-3">
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0 ${color}`}>
                   {label[0]}
                 </span>
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-900 dark:text-gray-100">{label}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-gray-100 text-sm">{label}</div>
                   <div className={`text-xs ${STATUS_COLORS[status]}`}>
                     {status}{note ? ` · ${note}` : ''}
                   </div>
                   {id === 'twitch' && twitchUsername && (
-                    <div className="text-xs text-gray-400 mt-0.5">Connected as {twitchUsername}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">Connected as {twitchUsername}</div>
                   )}
                   {id === 'twitch' && twitchError && (
                     <p className="text-xs text-red-400 mt-0.5">{twitchError}</p>
@@ -144,20 +144,20 @@ export default function AccountManager(): React.JSX.Element {
                 {hasToken ? (
                   <button
                     onClick={() => void handleDisconnect(id)}
-                    className="px-3 py-1 text-sm text-red-600 border border-red-300 rounded hover:bg-red-50 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950"
+                    className="px-3 py-1 text-xs text-red-400 border border-red-400/30 rounded-lg hover:bg-red-400/10 transition-colors shrink-0"
                   >
                     Disconnect
                   </button>
                 ) : (
                   <button
                     onClick={() => void handleConnect(id)}
-                    className="px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded"
+                    className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shrink-0"
                   >
                     Connect
                   </button>
                 )}
               </div>
-              <div className="mt-2 flex flex-col gap-1 pl-12">
+              <div className="mt-2.5 flex flex-col gap-1.5 pl-11">
                 {channelFields.map(({ key, placeholder }) => (
                   <input
                     key={key}
@@ -165,7 +165,7 @@ export default function AccountManager(): React.JSX.Element {
                     placeholder={placeholder}
                     defaultValue={(channelIds[key] as string | undefined) ?? ''}
                     onBlur={e => handleChannelIdBlur(key, e.currentTarget.value)}
-                    className="w-full bg-gray-50 border border-gray-300 rounded px-2 py-1 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500"
+                    className="w-full bg-gray-900/60 border border-white/8 rounded-lg px-3 py-1.5 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:border-indigo-500/60 transition-colors"
                   />
                 ))}
               </div>

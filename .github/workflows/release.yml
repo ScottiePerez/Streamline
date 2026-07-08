@@ -22,12 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native modules for Electron
+        run: npx @electron/rebuild
+
       - name: Build and package (macOS)
         run: npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload DMGs to release
+      - name: Upload DMG to release
         uses: softprops/action-gh-release@v2
         with:
           files: release/*.dmg
@@ -45,8 +48,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native modules for Electron
+        run: npx @electron/rebuild
+
       - name: Build and package (Windows)
-        run: npx electron-vite build && npx electron-builder --win
+        run: npm run package:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
