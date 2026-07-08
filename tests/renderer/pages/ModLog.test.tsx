@@ -29,6 +29,7 @@ beforeEach(() => {
     setCustomSound: jest.fn().mockResolvedValue('/userData/sounds/twitch.mp3'),
     clearCustomSound: jest.fn().mockResolvedValue(undefined),
     pickSoundFile: jest.fn().mockResolvedValue(null),
+    startTwitchOAuth: jest.fn().mockResolvedValue('StreamerDude'),
     onMessage: jest.fn(() => jest.fn()),
     getRecentMessages: jest.fn().mockResolvedValue([]),
     onModResult: jest.fn(() => jest.fn()),

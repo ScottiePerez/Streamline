@@ -11,6 +11,7 @@ import { getRecentMessages } from './store/messages'
 import { getModerationActions, exportModerationCsv } from './store/moderation'
 import { getSettings, setSettings } from './store/settings'
 import { getToken, setToken, deleteToken, getSecret, setSecret } from './auth/keychain'
+import { startTwitchOAuth } from './auth/twitch-oauth'
 import { generateInviteCode, generateSalt } from './invite-code'
 
 export function registerIpcHandlers(
@@ -58,6 +59,13 @@ export function registerIpcHandlers(
   )
 
   ipcMain.handle('account:deleteToken', (_e, platform: Platform) => deleteToken(platform))
+
+  ipcMain.handle('twitch:startOAuth', async () => {
+    const { token, username } = await startTwitchOAuth()
+    await setToken('twitch', token)
+    setSettings(db, { twitchUsername: username })
+    return username
+  })
 
   ipcMain.handle('mod:getActions', (_e, filters?: { platform?: Platform; targetUserId?: string }) =>
     getModerationActions(db, filters)

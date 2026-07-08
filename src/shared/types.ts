@@ -72,6 +72,7 @@ export interface AppSettings {
   tiktokChannelId?: string
   facebookLiveVideoId?: string
   facebookPageId?: string
+  twitchUsername?: string
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {

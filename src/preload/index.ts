@@ -61,6 +61,10 @@ const electronAPI = {
     return ipcRenderer.invoke('account:deleteToken', platform)
   },
 
+  startTwitchOAuth(): Promise<string> {
+    return ipcRenderer.invoke('twitch:startOAuth')
+  },
+
   getModerationActions(filters?: { platform?: Platform; targetUserId?: string }): Promise<ModerationAction[]> {
     return ipcRenderer.invoke('mod:getActions', filters)
   },
