@@ -9,6 +9,7 @@ import { TikTokAdapter } from './adapters/tiktok'
 import { FacebookAdapter } from './adapters/facebook'
 import { registerIpcHandlers } from './ipc-handlers'
 import { getToken, getSecret } from './auth/keychain'
+import { handleOAuthCallback } from './auth/twitch-oauth'
 import { getSettings } from './store/settings'
 import { TeamServer } from './team-server'
 import { TeamClient } from './team-client'
@@ -118,6 +119,20 @@ async function main(): Promise<void> {
     }).catch(err => console.error('Auto-connect failed (facebook):', err))
   }
 }
+
+app.setAsDefaultProtocolClient('streamline')
+
+// macOS: OS delivers the custom-scheme URL via open-url
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  if (url.startsWith('streamline://auth/')) handleOAuthCallback(url)
+})
+
+// Windows: app relaunched as second instance with URL in argv
+app.on('second-instance', (_event, argv) => {
+  const url = argv.find(arg => arg.startsWith('streamline://auth/'))
+  if (url) handleOAuthCallback(url)
+})
 
 app.whenReady().then(main)
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
