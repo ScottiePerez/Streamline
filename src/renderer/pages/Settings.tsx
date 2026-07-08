@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import type { AppSettings, Platform } from '../../shared/types'
 import type { TeamClientStatus } from '../../main/team-client'
+import { playDefaultTone } from '../audio/tones'
+
+function basename(p: string): string {
+  return p.split(/[\\/]/).pop() ?? p
+}
 
 interface Props {
   onSettingsChange: (partial: Partial<AppSettings>) => void
@@ -60,9 +65,16 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
   const [joinPassphrase, setJoinPassphrase] = useState('')
   const [teamStatus, setTeamStatus] = useState<TeamClientStatus>('disconnected')
   const [copied, setCopied] = useState(false)
+  const [soundPaths, setSoundPaths] = useState<Record<Platform, string | null>>({
+    twitch: null, youtube: null, kick: null, tiktok: null, facebook: null
+  })
+  const [soundErrors, setSoundErrors] = useState<Partial<Record<Platform, string>>>({})
 
   useEffect(() => {
-    window.electronAPI.getSettings().then(s => setSettings(s))
+    window.electronAPI.getSettings().then(s => {
+      setSettings(s)
+      if (s.notificationSoundPaths) setSoundPaths(s.notificationSoundPaths)
+    })
     window.electronAPI.getTeamStatus().then(setTeamStatus)
     window.electronAPI.getTeamClientCount().then(setClientCount)
     const unsubStatus = window.electronAPI.onTeamStatus(setTeamStatus)
@@ -79,6 +91,39 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
     window.electronAPI.setSettings(partial)
     setSettings(prev => (prev ? { ...prev, ...partial } : prev))
     onSettingsChange(partial)
+  }
+
+  async function handlePreview(platform: Platform): Promise<void> {
+    const customPath = soundPaths[platform]
+    if (customPath) {
+      new Audio(`file://${customPath}`).play().catch(() => {})
+    } else {
+      playDefaultTone(platform)
+    }
+  }
+
+  async function handleChangeSoundFile(platform: Platform): Promise<void> {
+    const filePath = await window.electronAPI.pickSoundFile()
+    if (!filePath) return
+    try {
+      const dest = await window.electronAPI.setCustomSound(platform, filePath)
+      const updated = { ...soundPaths, [platform]: dest }
+      setSoundPaths(updated)
+      save({ notificationSoundPaths: updated })
+      setSoundErrors(prev => { const next = { ...prev }; delete next[platform]; return next })
+    } catch (err) {
+      setSoundErrors(prev => ({
+        ...prev,
+        [platform]: err instanceof Error ? err.message : 'Failed to set sound'
+      }))
+    }
+  }
+
+  async function handleResetSound(platform: Platform): Promise<void> {
+    await window.electronAPI.clearCustomSound(platform)
+    const updated = { ...soundPaths, [platform]: null }
+    setSoundPaths(updated)
+    save({ notificationSoundPaths: updated })
   }
 
   if (!settings) {
@@ -170,15 +215,45 @@ export default function Settings({ onSettingsChange }: Props): React.JSX.Element
           <SectionHeading>Notification Sounds</SectionHeading>
           <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:divide-gray-700">
             {PLATFORMS.map(({ id, label }) => (
-              <div key={id} className="flex items-center justify-between px-4 py-3">
-                <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
-                <Toggle
-                  id={label.toLowerCase()}
-                  checked={settings.notificationSounds[id]}
-                  onChange={val =>
-                    save({ notificationSounds: { ...settings.notificationSounds, [id]: val } })
-                  }
-                />
+              <div key={id} className="px-4 py-3 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
+                  <Toggle
+                    id={label.toLowerCase()}
+                    checked={settings.notificationSounds[id]}
+                    onChange={val =>
+                      save({ notificationSounds: { ...settings.notificationSounds, [id]: val } })
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 flex-1 truncate">
+                    {soundPaths[id] ? basename(soundPaths[id]!) : 'Default'}
+                  </span>
+                  <button
+                    onClick={() => void handlePreview(id)}
+                    className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  >
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => void handleChangeSoundFile(id)}
+                    className="px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  >
+                    Change
+                  </button>
+                  {soundPaths[id] && (
+                    <button
+                      onClick={() => void handleResetSound(id)}
+                      className="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+                {soundErrors[id] && (
+                  <p className="text-xs text-red-500">{soundErrors[id]}</p>
+                )}
               </div>
             ))}
           </div>

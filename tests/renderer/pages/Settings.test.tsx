@@ -2,6 +2,11 @@ import React from 'react'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import Settings from '../../../src/renderer/pages/Settings'
 import type { AppSettings } from '../../../src/shared/types'
+import { playDefaultTone } from '../../../src/renderer/audio/tones'
+
+jest.mock('../../../src/renderer/audio/tones', () => ({
+  playDefaultTone: jest.fn()
+}))
 
 const DEFAULT: AppSettings = {
   theme: 'dark',
@@ -203,5 +208,71 @@ describe('Settings — Team Mode', () => {
     fireEvent.change(portInput, { target: { value: '8080' } })
     fireEvent.blur(portInput)
     expect(window.electronAPI.setSettings).toHaveBeenCalledWith({ teamModePort: 8080 })
+  })
+})
+
+describe('Settings — Notification Sounds expanded UI', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({ ...DEFAULT })
+  })
+
+  it('shows Default label when no custom sound set', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    const defaultLabels = await screen.findAllByText('Default')
+    expect(defaultLabels.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('Preview button plays default tone for that platform', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    await screen.findAllByRole('button', { name: /preview/i })
+    const previews = screen.getAllByRole('button', { name: /preview/i })
+    fireEvent.click(previews[0])
+    expect(playDefaultTone).toHaveBeenCalledWith('twitch')
+  })
+
+  it('Change button calls pickSoundFile then setCustomSound', async () => {
+    ;(window.electronAPI.pickSoundFile as jest.Mock).mockResolvedValue('/my/sound.mp3')
+    render(<Settings onSettingsChange={jest.fn()} />)
+    await screen.findAllByRole('button', { name: /change/i })
+    fireEvent.click(screen.getAllByRole('button', { name: /change/i })[0])
+    await waitFor(() => expect(window.electronAPI.pickSoundFile).toHaveBeenCalled())
+    await waitFor(() =>
+      expect(window.electronAPI.setCustomSound).toHaveBeenCalledWith('twitch', '/my/sound.mp3')
+    )
+  })
+
+  it('shows filename when custom sound is set', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      ...DEFAULT,
+      notificationSoundPaths: {
+        twitch: '/userData/sounds/twitch.mp3',
+        youtube: null, kick: null, tiktok: null, facebook: null
+      }
+    })
+    render(<Settings onSettingsChange={jest.fn()} />)
+    expect(await screen.findByText('twitch.mp3')).toBeInTheDocument()
+  })
+
+  it('Reset button calls clearCustomSound', async () => {
+    ;(window.electronAPI.getSettings as jest.Mock).mockResolvedValue({
+      ...DEFAULT,
+      notificationSoundPaths: {
+        twitch: '/userData/sounds/twitch.mp3',
+        youtube: null, kick: null, tiktok: null, facebook: null
+      }
+    })
+    render(<Settings onSettingsChange={jest.fn()} />)
+    const resetBtn = await screen.findByRole('button', { name: /reset/i })
+    fireEvent.click(resetBtn)
+    await waitFor(() =>
+      expect(window.electronAPI.clearCustomSound).toHaveBeenCalledWith('twitch')
+    )
+  })
+
+  it('does not show Reset button when no custom sound', async () => {
+    render(<Settings onSettingsChange={jest.fn()} />)
+    await screen.findAllByText('Default')
+    expect(screen.queryByRole('button', { name: /reset/i })).not.toBeInTheDocument()
   })
 })
