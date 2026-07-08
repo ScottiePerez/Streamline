@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "outDir": "dist-electron",
     "rootDir": "src",
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
   "include": ["src/main/**/*", "src/preload/**/*", "src/shared/**/*"]
 }
