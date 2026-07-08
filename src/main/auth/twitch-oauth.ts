@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto'
 import { shell } from 'electron'
 
-export const TWITCH_CLIENT_ID = 'REPLACE_WITH_YOUR_CLIENT_ID'
+export const TWITCH_CLIENT_ID = '12yxt1dw65n5x95eykh9b5czbuyrd7'
 
 const SCOPES = 'chat:read chat:edit moderator:manage:chat_messages moderator:manage:banned_users'
 const REDIRECT_URI = 'https://scottieperez.github.io/Streamline/callback'
