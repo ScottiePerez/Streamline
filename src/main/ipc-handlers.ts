@@ -1,7 +1,7 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import type { ChatBus } from './chat-bus'
 import type { Db } from './store/db'
-import type { Platform, AppSettings } from '../shared/types'
+import type { Platform, AppSettings, ConnectionStatus } from '../shared/types'
 import { getRecentMessages } from './store/messages'
 import { getModerationActions, exportModerationCsv } from './store/moderation'
 import { getSettings, setSettings } from './store/settings'
@@ -10,7 +10,7 @@ import { getToken, setToken, deleteToken } from './auth/keychain'
 export function registerIpcHandlers(bus: ChatBus, db: Db, win: BrowserWindow): void {
   bus.on('message', msg => win.webContents.send('chat:message', msg))
   bus.on('modResult', result => win.webContents.send('mod:result', result))
-  bus.on('status', (platform: Platform, status: string) =>
+  bus.on('status', (platform: Platform, status: ConnectionStatus) =>
     win.webContents.send('account:status', platform, status)
   )
 
@@ -29,7 +29,7 @@ export function registerIpcHandlers(bus: ChatBus, db: Db, win: BrowserWindow): v
     return bus.moderate(platform, action, targetUserId, messageId, duration)
   })
 
-  ipcMain.handle('chat:history', (_e, limit: number) => {
+  ipcMain.handle('chat:history', async (_e, limit: number) => {
     return getRecentMessages(db, limit)
   })
 
