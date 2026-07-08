@@ -65,6 +65,18 @@ const electronAPI = {
     return ipcRenderer.invoke('twitch:startOAuth')
   },
 
+  startYouTubeOAuth(clientId: string): Promise<{ channelId: string; displayName: string }> {
+    return ipcRenderer.invoke('youtube:startOAuth', clientId)
+  },
+
+  connectKick(slug: string): Promise<{ username: string; displayName: string }> {
+    return ipcRenderer.invoke('kick:connect', slug)
+  },
+
+  connectTikTok(username: string): Promise<string> {
+    return ipcRenderer.invoke('tiktok:connect', username)
+  },
+
   getModerationActions(filters?: { platform?: Platform; targetUserId?: string }): Promise<ModerationAction[]> {
     return ipcRenderer.invoke('mod:getActions', filters)
   },

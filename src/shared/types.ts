@@ -73,6 +73,9 @@ export interface AppSettings {
   facebookLiveVideoId?: string
   facebookPageId?: string
   twitchUsername?: string
+  youtubeDisplayName?: string
+  kickDisplayName?: string
+  youtubeClientId?: string
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {

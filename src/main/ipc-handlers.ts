@@ -12,6 +12,8 @@ import { getModerationActions, exportModerationCsv } from './store/moderation'
 import { getSettings, setSettings } from './store/settings'
 import { getToken, setToken, deleteToken, getSecret, setSecret } from './auth/keychain'
 import { startTwitchOAuth } from './auth/twitch-oauth'
+import { startYouTubeOAuth } from './auth/youtube-oauth'
+import { validateKickChannel } from './auth/kick-connect'
 import { generateInviteCode, generateSalt } from './invite-code'
 
 export function registerIpcHandlers(
@@ -65,6 +67,27 @@ export function registerIpcHandlers(
     await setToken('twitch', token)
     setSettings(db, { twitchUsername: username })
     return username
+  })
+
+  ipcMain.handle('youtube:startOAuth', async (_e, clientId: string) => {
+    const { token, channelId, displayName } = await startYouTubeOAuth(clientId)
+    await setToken('youtube', token)
+    setSettings(db, { youtubeChannelId: channelId, youtubeDisplayName: displayName })
+    return { channelId, displayName }
+  })
+
+  ipcMain.handle('kick:connect', async (_e, slug: string) => {
+    const info = await validateKickChannel(slug)
+    await setToken('kick', 'kick-connected')
+    setSettings(db, { kickChannelId: slug, kickDisplayName: info.displayName })
+    return info
+  })
+
+  ipcMain.handle('tiktok:connect', async (_e, username: string) => {
+    if (!username.trim()) throw new Error('Enter your TikTok username')
+    await setToken('tiktok', 'tiktok-connected')
+    setSettings(db, { tiktokChannelId: username.trim() })
+    return username.trim()
   })
 
   ipcMain.handle('mod:getActions', (_e, filters?: { platform?: Platform; targetUserId?: string }) =>

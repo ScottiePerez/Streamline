@@ -10,6 +10,7 @@ import { FacebookAdapter } from './adapters/facebook'
 import { registerIpcHandlers } from './ipc-handlers'
 import { getToken, getSecret } from './auth/keychain'
 import { handleOAuthCallback } from './auth/twitch-oauth'
+import { handleYouTubeOAuthCallback } from './auth/youtube-oauth'
 import { getSettings } from './store/settings'
 import { TeamServer } from './team-server'
 import { TeamClient } from './team-client'
@@ -125,7 +126,8 @@ app.setAsDefaultProtocolClient('streamline')
 // macOS: OS delivers the custom-scheme URL via open-url
 app.on('open-url', (event, url) => {
   event.preventDefault()
-  if (url.startsWith('streamline://auth/')) handleOAuthCallback(url)
+  if (url.startsWith('streamline://auth/twitch')) handleOAuthCallback(url)
+  else if (url.startsWith('streamline://auth/youtube')) handleYouTubeOAuthCallback(url)
 })
 
 // Windows: app relaunched as second instance with URL in argv
