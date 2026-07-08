@@ -2,16 +2,17 @@
   "name": "streamchat",
   "version": "0.1.0",
   "description": "Multi-platform streaming chat manager",
-  "main": "dist-electron/main/index.js",
+  "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "package": "electron-vite build && electron-builder --mac"
   },
   "keywords": [],
-  "author": "",
+  "author": "Scottie Perez",
   "license": "ISC",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
