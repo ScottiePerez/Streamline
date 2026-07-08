@@ -1,6 +1,6 @@
 import React from 'react'
 
-type View = 'chat' | 'accounts'
+type View = 'chat' | 'accounts' | 'settings'
 
 interface Props {
   activeView: View
@@ -9,7 +9,8 @@ interface Props {
 
 const navItems: { view: View; label: string; icon: string }[] = [
   { view: 'chat', label: 'Chat', icon: '💬' },
-  { view: 'accounts', label: 'Accounts', icon: '🔑' }
+  { view: 'accounts', label: 'Accounts', icon: '🔑' },
+  { view: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
 export default function Sidebar({ activeView, onViewChange }: Props): React.JSX.Element {
