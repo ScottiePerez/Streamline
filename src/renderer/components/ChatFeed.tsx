@@ -17,7 +17,7 @@ export default function ChatFeed({ filters }: Props): React.JSX.Element {
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
+    const isAtBottom = container.scrollTop < 100
     if (isAtBottom) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }

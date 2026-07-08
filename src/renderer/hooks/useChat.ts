@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChatMessage, Platform } from '../../shared/types'
 
 export interface ChatFilters {
@@ -23,26 +23,30 @@ function matchesFilters(msg: ChatMessage, filters: ChatFilters): boolean {
 const MAX_FEED_MESSAGES = 500
 
 export function useChat(filters: ChatFilters): { messages: ChatMessage[] } {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [allMessages, setAllMessages] = useState<ChatMessage[]>([])
   const filtersRef = useRef(filters)
   filtersRef.current = filters
 
   useEffect(() => {
-    window.electronAPI.getRecentMessages(100).then(history => {
-      setMessages(history.filter(m => matchesFilters(m, filtersRef.current)))
+    window.electronAPI.getRecentMessages(MAX_FEED_MESSAGES).then(history => {
+      setAllMessages(history)
     })
   }, [])
 
   useEffect(() => {
     const unsub = window.electronAPI.onMessage(msg => {
-      if (!matchesFilters(msg, filtersRef.current)) return
-      setMessages(prev => {
+      setAllMessages(prev => {
         const next = [msg, ...prev]
         return next.length > MAX_FEED_MESSAGES ? next.slice(0, MAX_FEED_MESSAGES) : next
       })
     })
     return unsub
   }, [])
+
+  const messages = useMemo(
+    () => allMessages.filter(msg => matchesFilters(msg, filters)),
+    [allMessages, filters]
+  )
 
   return { messages }
 }

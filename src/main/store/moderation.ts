@@ -60,12 +60,20 @@ export function getModerationActions(
   return (db.prepare(query).all(...params) as ActionRow[]).map(rowToAction)
 }
 
+function csvCell(value: string | number): string {
+  const s = String(value)
+  if (s.includes(',') || s.includes('"') || s.includes('\n') || /^[=+\-@]/.test(s)) {
+    return `"${s.replace(/"/g, '""')}"`
+  }
+  return s
+}
+
 export function exportModerationCsv(db: Db): string {
   const actions = getModerationActions(db)
   const header = 'id,platform,type,targetUsername,moderatorName,reason,duration,timestamp'
   const rows = actions.map(a =>
     [a.id, a.platform, a.type, a.targetUsername, a.moderatorName,
-     a.reason ?? '', a.duration ?? '', a.timestamp].join(',')
+     a.reason ?? '', a.duration ?? '', a.timestamp].map(csvCell).join(',')
   )
   return [header, ...rows].join('\n')
 }

@@ -64,6 +64,7 @@ export interface AppSettings {
   notificationSounds: Record<Platform, boolean>
   teamModeEnabled: boolean
   teamModePort: number
+  twitchChannelId?: string
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -78,5 +79,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
     facebook: false
   },
   teamModeEnabled: false,
-  teamModePort: 7350
+  teamModePort: 7350,
+  twitchChannelId: ''
 }
