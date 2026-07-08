@@ -63,6 +63,7 @@ export interface AppSettings {
   fontSize: 'sm' | 'md' | 'lg'
   maxMessagesPerPlatform: number
   notificationSounds: Record<Platform, boolean>
+  notificationSoundPaths: Record<Platform, string | null>
   teamModeEnabled: boolean
   teamModePort: number
   twitchChannelId?: string
@@ -83,6 +84,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
     kick: false,
     tiktok: false,
     facebook: false
+  },
+  notificationSoundPaths: {
+    twitch: null,
+    youtube: null,
+    kick: null,
+    tiktok: null,
+    facebook: null
   },
   teamModeEnabled: false,
   teamModePort: 7350,
