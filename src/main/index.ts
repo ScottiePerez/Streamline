@@ -108,3 +108,25 @@ async function main(): Promise<void> {
     }).catch(err => console.error('Auto-connect failed (tiktok):', err))
   }
 
+}
+
+app.setAsDefaultProtocolClient('streamline')
+
+// macOS: OS delivers the custom-scheme URL via open-url
+app.on('open-url', (event, url) => {
+  event.preventDefault()
+  if (url.startsWith('streamline://auth/twitch')) handleOAuthCallback(url)
+  else if (url.startsWith('streamline://auth/youtube')) handleYouTubeOAuthCallback(url)
+})
+
+// Windows: app relaunched as second instance with URL in argv
+app.on('second-instance', (_event, argv) => {
+  const url = argv.find(arg => arg.startsWith('streamline://auth/'))
+  if (url) {
+    if (url.startsWith('streamline://auth/twitch')) handleOAuthCallback(url)
+    else if (url.startsWith('streamline://auth/youtube')) handleYouTubeOAuthCallback(url)
+  }
+})
+
+app.whenReady().then(main)
+app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
