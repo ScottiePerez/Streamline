@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native modules for Electron (macOS)
+        run: npx @electron/rebuild
+
       - name: Build and package (macOS)
         run: npm run package
         env:
@@ -44,6 +47,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Rebuild native modules for Electron (Windows)
+        run: npx @electron/rebuild
 
       - name: Build and package (Windows)
         run: npm run package:win
